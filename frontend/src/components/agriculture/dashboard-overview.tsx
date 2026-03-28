@@ -1,18 +1,28 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { motion } from 'framer-motion'
-import Image from 'next/image'
-import { 
-  TrendingUp, 
-  TrendingDown, 
-  Sprout, 
-  Droplets, 
+import {
+  TrendingUp,
+  TrendingDown,
+  Sprout,
+  Droplets,
   Sun,
   Wheat,
-  MapPin
+  MapPin,
+  Calendar,
+  Clock,
+  CheckCircle2,
+  AlertCircle,
+  X,
+  CircleDot
 } from 'lucide-react'
 import { Card, CardContent } from '@/components/ui/card'
 import { Card3D } from './animations'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import api, { TarefaResponse, CulturaResponse } from '@/lib/api'
 
 interface CropData {
   id: number
@@ -30,11 +40,145 @@ interface DashboardOverviewProps {
   tarefas?: TarefaData[]
 }
 
+interface AgendaItem {
+  id: number
+  titulo: string
+  data: string
+  tipo: 'tarefa' | 'cultura'
+  status?: string
+  prioridade?: string
+  icone: string
+  corFundo: string
+  descricao?: string
+}
+
 export function DashboardOverview({ culturas = [], tarefas = [] }: DashboardOverviewProps) {
+  const [isAgendaOpen, setIsAgendaOpen] = useState(false)
+  const [agendaItems, setAgendaItems] = useState<AgendaItem[]>([])
+  const [isLoading, setIsLoading] = useState(false)
   const culturasAtivas = culturas.length || 12
   const totalArea = culturas.reduce((acc, c) => acc + parseFloat(c.area.replace(' ha', '')), 0) || 450
   const tarefasPendentes = tarefas.filter(t => t.status === 'pending').length || 5
   const tarefasConcluidas = tarefas.filter(t => t.status === 'completed').length || 7
+
+  useEffect(() => {
+    if (isAgendaOpen) {
+      carregarAgenda()
+    }
+  }, [isAgendaOpen])
+
+  const carregarAgenda = async () => {
+    try {
+      setIsLoading(true)
+      const [tarefasData, culturasData] = await Promise.all([
+        api.tarefas.getAll(),
+        api.culturas.getAll()
+      ])
+
+      const items: AgendaItem[] = []
+
+      // Adicionar tarefas
+      tarefasData.forEach(tarefa => {
+        items.push({
+          id: tarefa.id,
+          titulo: tarefa.titulo,
+          data: tarefa.dataVencimento,
+          tipo: 'tarefa',
+          status: tarefa.status,
+          prioridade: tarefa.prioridade,
+          icone: getIconeTarefa(tarefa.titulo),
+          corFundo: getCorFundoTarefa(tarefa.status),
+          descricao: tarefa.descricao || ''
+        })
+      })
+
+      // Adicionar culturas
+      culturasData.forEach(cultura => {
+        items.push({
+          id: cultura.id,
+          titulo: `${cultura.nome} - ${cultura.status}`,
+          data: cultura.dataPlantio,
+          tipo: 'cultura',
+          status: cultura.status,
+          icone: getIconeCultura(cultura.status),
+          corFundo: getCorFundoCultura(cultura.status),
+          descricao: `${cultura.area} ha`
+        })
+      })
+
+      // Ordenar por data
+      items.sort((a, b) => new Date(a.data).getTime() - new Date(b.data).getTime())
+      setAgendaItems(items)
+    } catch (error) {
+      console.error('Erro ao carregar agenda:', error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  const getIconeTarefa = (titulo: string): string => {
+    const t = titulo.toLowerCase()
+    if (t.includes('irrig')) return 'droplet'
+    if (t.includes('fertil')) return 'flask'
+    if (t.includes('praga')) return 'bug'
+    if (t.includes('colheita')) return 'wheat'
+    if (t.includes('plantio')) return 'sprout'
+    if (t.includes('manuten')) return 'wrench'
+    return 'circle'
+  }
+
+  const getIconeCultura = (status: string): string => {
+    const s = status?.toLowerCase() || ''
+    if (s.includes('plantio') || s.includes('crescendo')) return 'sprout'
+    if (s.includes('colheita')) return 'wheat'
+    if (s.includes('tratos')) return 'flask'
+    if (s.includes('finalizada')) return 'check'
+    return 'sprout'
+  }
+
+  const getCorFundoTarefa = (status: string): string => {
+    const s = status?.toLowerCase() || ''
+    if (s.includes('pending') || s.includes('pendente')) return 'bg-amber-100 text-amber-600'
+    if (s.includes('progress') || s.includes('andamento')) return 'bg-blue-100 text-blue-600'
+    if (s.includes('completed') || s.includes('concluida')) return 'bg-emerald-100 text-emerald-600'
+    return 'bg-gray-100 text-gray-600'
+  }
+
+  const getCorFundoCultura = (status: string): string => {
+    const s = status?.toLowerCase() || ''
+    if (s.includes('plantio') || s.includes('crescendo')) return 'bg-emerald-100 text-emerald-600'
+    if (s.includes('colheita')) return 'bg-amber-100 text-amber-600'
+    if (s.includes('tratos')) return 'bg-violet-100 text-violet-600'
+    if (s.includes('finalizada')) return 'bg-emerald-100 text-emerald-600'
+    return 'bg-gray-100 text-gray-600'
+  }
+
+  const renderIcone = (icone: string, className: string = "w-5 h-5") => {
+    switch (icone) {
+      case 'sprout': return <Sprout className={className} />
+      case 'droplet': return <Droplets className={className} />
+      case 'flask': return <Sun className={className} />
+      case 'bug': return <AlertCircle className={className} />
+      case 'wheat': return <Wheat className={className} />
+      case 'wrench': return <MapPin className={className} />
+      case 'check': return <CheckCircle2 className={className} />
+      default: return <CircleDot className={className} />
+    }
+  }
+
+  const formatarData = (data: string) => {
+    const date = new Date(data + 'T00:00:00')
+    const hoje = new Date()
+    hoje.setHours(0, 0, 0, 0)
+    const diffTime = date.getTime() - hoje.getTime()
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24))
+
+    if (diffDays === 0) return 'Hoje'
+    if (diffDays === 1) return 'Amanhã'
+    if (diffDays === -1) return 'Ontem'
+    if (diffDays > 1 && diffDays <= 7) return date.toLocaleDateString('pt-BR', { weekday: 'long' })
+    return date.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' })
+  }
 
   const stats = [
     {
@@ -121,23 +265,21 @@ export function DashboardOverview({ culturas = [], tarefas = [] }: DashboardOver
               <div className="flex flex-col lg:flex-row items-center justify-between gap-6">
                 {/* Logo and Welcome */}
                 <div className="flex items-center gap-6">
-                  <motion.div 
-                    className="relative w-40 h-auto"
-                    animate={{ 
+                  <motion.div
+                    className="relative w-64 h-auto"
+                    animate={{
                       scale: [1, 1.02, 1],
                     }}
                     transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
                   >
-                    <Image
-                      src="/agriconnect-logo-main.png"
+                    <img
+                      src="/logomarca.png"
                       alt="AgriConnect"
-                      width={160}
-                      height={88}
-                      className="w-40 h-auto"
-                      priority
+                      className="w-full h-auto drop-shadow-xl"
+                      style={{ mixBlendMode: 'multiply' }}
                     />
                   </motion.div>
-                  
+
                   <div className="hidden lg:block w-px h-16 bg-white/20" />
                   
                   <div className="hidden lg:block">
@@ -162,7 +304,7 @@ export function DashboardOverview({ culturas = [], tarefas = [] }: DashboardOver
                 
                 {/* Quick Actions */}
                 <div className="flex flex-wrap gap-3">
-                  <motion.button 
+                  <motion.button
                     className="px-5 py-2.5 bg-white text-emerald-700 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all flex items-center gap-2"
                     whileHover={{ scale: 1.05, y: -2 }}
                     whileTap={{ scale: 0.98 }}
@@ -170,10 +312,11 @@ export function DashboardOverview({ culturas = [], tarefas = [] }: DashboardOver
                     <Sprout className="w-4 h-4" />
                     Nova Cultura
                   </motion.button>
-                  <motion.button 
+                  <motion.button
                     className="px-5 py-2.5 bg-emerald-500/80 backdrop-blur-sm text-white rounded-xl font-semibold border border-white/20 shadow-lg hover:bg-emerald-400 transition-colors flex items-center gap-2"
                     whileHover={{ scale: 1.05, y: -2 }}
                     whileTap={{ scale: 0.98 }}
+                    onClick={() => setIsAgendaOpen(true)}
                   >
                     <Sun className="w-4 h-4" />
                     Ver Agenda
@@ -287,6 +430,90 @@ export function DashboardOverview({ culturas = [], tarefas = [] }: DashboardOver
           )
         })}
       </div>
+
+      {/* Agenda Dialog */}
+      <Dialog open={isAgendaOpen} onOpenChange={setIsAgendaOpen}>
+        <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-2xl">
+                <Calendar className="w-6 h-6 text-emerald-600" />
+                Agenda de Atividades
+              </div>
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setIsAgendaOpen(false)}
+                className="rounded-full"
+              >
+                <X className="w-5 h-5" />
+              </Button>
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="mt-6">
+            {isLoading ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-emerald-600"></div>
+              </div>
+            ) : agendaItems.length > 0 ? (
+              <div className="space-y-3">
+                {agendaItems.map((item, index) => (
+                  <motion.div
+                    key={`${item.tipo}-${item.id}`}
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: index * 0.05 }}
+                    className="flex items-start gap-4 p-4 rounded-xl border border-gray-100 hover:bg-gray-50 transition-colors"
+                  >
+                    <div className={`p-2.5 rounded-lg ${item.corFundo} shrink-0`}>
+                      {renderIcone(item.icone, "w-5 h-5")}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-start justify-between gap-2">
+                        <div>
+                          <p className="font-semibold text-gray-800">{item.titulo}</p>
+                          {item.descricao && (
+                            <p className="text-sm text-gray-600 mt-0.5">{item.descricao}</p>
+                          )}
+                        </div>
+                        <div className="flex items-center gap-2 shrink-0">
+                          <Badge variant="outline" className="text-xs capitalize">
+                            {item.tipo}
+                          </Badge>
+                          {item.prioridade && (
+                            <Badge variant="outline" className="text-xs capitalize">
+                              {item.prioridade.toLowerCase()}
+                            </Badge>
+                          )}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-4 mt-2">
+                        <div className="flex items-center gap-1.5 text-xs text-gray-500">
+                          <Calendar className="w-3.5 h-3.5" />
+                          <span>{formatarData(item.data)}</span>
+                        </div>
+                        {item.status && (
+                          <div className="flex items-center gap-1.5 text-xs text-gray-500">
+                            <CheckCircle2 className="w-3.5 h-3.5" />
+                            <span className="capitalize">{item.status.replace('_', ' ')}</span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-12 text-gray-500">
+                <Calendar className="w-16 h-16 mx-auto mb-3 opacity-20" />
+                <p className="text-lg font-medium">Nenhuma atividade na agenda</p>
+                <p className="text-sm mt-1">Adicione tarefas ou culturas para ver sua agenda</p>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }

@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(del *)",
+      "Bash(npm run *)",
+      "Bash(netstat *)",
+      "Bash(findstr *)",
+      "Bash(type *)",
+      "Bash(copy *)",
+      "Bash(mvnw *)",
+      "Bash(mvn *)"
+    ]
+  },
+  "$version": 3
+}

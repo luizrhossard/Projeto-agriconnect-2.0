@@ -14,7 +14,6 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Badge } from '@/components/ui/badge'
-import Image from 'next/image'
 
 interface DashboardHeaderProps {
   onMenuClick: () => void
@@ -37,17 +36,15 @@ export function DashboardHeader({ onMenuClick }: DashboardHeaderProps) {
           
           {/* Mobile Logo */}
           <div className="flex items-center gap-2 lg:hidden">
-            <motion.div 
-              className="relative w-10 h-auto"
+            <motion.div
+              className="relative w-12 h-auto"
               whileHover={{ scale: 1.05 }}
             >
-              <Image
-                src="/agriconnect-logo-main.png"
+              <img
+                src="/logomarca.png"
                 alt="AgriConnect"
-                width={40}
-                height={22}
-                className="w-10 h-auto"
-                priority
+                className="w-full h-auto drop-shadow-md"
+                style={{ mixBlendMode: 'multiply' }}
               />
             </motion.div>
           </div>

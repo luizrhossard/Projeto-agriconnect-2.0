@@ -92,6 +92,20 @@ export interface DashboardResponse {
   tarefasConcluidas: number;
   ultimasCulturas: CulturaResponse[];
   tarefasPendentesList: TarefaResponse[];
+  atividadesRecentes: AtividadeRecenteResponse[];
+}
+
+export interface AtividadeRecenteResponse {
+  tipo: string;
+  titulo: string;
+  descricao: string;
+  culturaNome: string | null;
+  area: string;
+  data: string;
+  icone: string;
+  status: string;
+  iconeTipo: string;
+  corFundo: string;
 }
 
 export interface UsuarioResponse {
@@ -149,6 +163,9 @@ export const api = {
     login: async (data: LoginRequest): Promise<AuthResponse> => {
       const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify(data),
       });
       if (!response.ok) {
@@ -161,6 +178,9 @@ export const api = {
     register: async (data: RegisterRequest): Promise<AuthResponse> => {
       const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify(data),
       });
       if (!response.ok) {

@@ -63,6 +63,17 @@ A aplicação estará disponível em:
 |---------|-------|-------|
 | Admin | admin@agricultura.com | admin123 |
 | Usuário | usuario@agricultura.com | user123 |
+Use estas credenciais para entrar na tela de login:
+
+```txt
+ADMIN
+email: admin@agricultura.com
+senha: admin123
+
+USUARIO
+email: usuario@agricultura.com
+senha: user123
+```
 
 ## 🐳 Executando sem Docker
 
@@ -149,6 +160,9 @@ APP_JWT_SECRET=chave-secreta-jwt
 APP_JWT_EXPIRATION=86400000
 ```
 
+> Observação: `APP_JWT_SECRET` pode ser uma string Base64 **ou** texto puro.
+> Recomenda-se uma chave forte (32+ caracteres).
+
 ### Frontend
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:8080
@@ -170,3 +184,4 @@ docker-compose exec postgres psql -U agricultura -d agricultura
 ## 📄 Licença
 
 MIT License
+

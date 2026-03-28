@@ -152,6 +152,7 @@ export function TasksPanel({ compact = false, tarefas, onTarefaCreated }: TasksP
   const [tasksList, setTasksList] = useState<TarefaData[]>(tarefas || tasks)
   const [filter, setFilter] = useState('all')
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [isAllTasksDialogOpen, setIsAllTasksDialogOpen] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [novaTarefa, setNovaTarefa] = useState<TarefaRequest>({
     titulo: '',
@@ -495,7 +496,11 @@ export function TasksPanel({ compact = false, tarefas, onTarefaCreated }: TasksP
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
           >
-            <Button variant="ghost" className="w-full mt-3 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50">
+            <Button
+              variant="ghost"
+              className="w-full mt-3 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50"
+              onClick={() => setIsAllTasksDialogOpen(true)}
+            >
               Ver todas as tarefas
               <motion.div
                 animate={{ x: [0, 4, 0] }}
@@ -506,6 +511,58 @@ export function TasksPanel({ compact = false, tarefas, onTarefaCreated }: TasksP
             </Button>
           </motion.div>
         )}
+
+        {/* All Tasks Dialog */}
+        <Dialog open={isAllTasksDialogOpen} onOpenChange={setIsAllTasksDialogOpen}>
+          <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="flex items-center gap-2 text-2xl">
+                <Calendar className="w-6 h-6 text-emerald-600" />
+                Todas as Tarefas
+              </DialogTitle>
+            </DialogHeader>
+            <div className="space-y-3 mt-6">
+              {tasksList.map((task) => {
+                const StatusIcon = statusConfig[task.status]?.icon || Clock
+                const taskPriorityConfig = priorityConfig[task.priority]
+
+                return (
+                  <div
+                    key={task.id}
+                    className="flex items-start gap-4 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors"
+                  >
+                    <div className="flex items-center">
+                      <Checkbox
+                        checked={task.status === 'completed'}
+                        onCheckedChange={() => toggleTask(task.id)}
+                        className="w-5 h-5"
+                      />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <StatusIcon className="w-4 h-4 text-emerald-600" />
+                        <p className="font-semibold text-gray-800">{task.title}</p>
+                      </div>
+                      <p className="text-sm text-gray-600 mb-2">{task.description}</p>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <Badge variant="outline" className={`text-xs ${taskPriorityConfig?.color}`}>
+                          {taskPriorityConfig?.label}
+                        </Badge>
+                        <Badge variant="outline" className={`text-xs ${statusConfig[task.status]?.color}`}>
+                          {statusConfig[task.status]?.label}
+                        </Badge>
+                        <div className="flex items-center gap-1 text-xs text-gray-500">
+                          <Calendar className="w-3 h-3" />
+                          <span>{new Date(task.dueDate).toLocaleDateString('pt-BR')}</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )
+              })}
+            </div>
+          </DialogContent>
+        </Dialog>
       </CardContent>
     </Card>
   )

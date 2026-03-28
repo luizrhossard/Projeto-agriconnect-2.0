@@ -15,7 +15,6 @@ com\agricultura\dto\LoginRequest.class
 com\agricultura\service\TarefaService.class
 com\agricultura\controller\PrecoMercadoController.class
 com\agricultura\controller\TarefaController.class
-com\agricultura\controller\DashboardController.class
 com\agricultura\service\PrecoMercadoService.class
 com\agricultura\dto\CulturaResponse.class
 com\agricultura\domain\Tarefa$TarefaBuilder.class
@@ -38,7 +37,6 @@ com\agricultura\controller\AuthController.class
 com\agricultura\domain\Cultura.class
 com\agricultura\dto\TarefaResponse.class
 com\agricultura\dto\UsuarioResponse$UsuarioResponseBuilder.class
-com\agricultura\service\DashboardService.class
 com\agricultura\security\JwtAuthenticationFilter.class
 com\agricultura\security\JwtService.class
 com\agricultura\repository\TarefaRepository.class

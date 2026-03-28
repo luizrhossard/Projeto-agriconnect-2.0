@@ -2,13 +2,12 @@
 
 import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
-import Image from 'next/image'
 import { useAuth } from '@/context/AuthContext'
-import { 
-  LayoutDashboard, 
-  Sprout, 
-  TrendingUp, 
-  ClipboardList, 
+import {
+  LayoutDashboard,
+  Sprout,
+  TrendingUp,
+  ClipboardList,
   BarChart3,
   Settings,
   LogOut,
@@ -92,26 +91,24 @@ export function Sidebar({ activeSection, setActiveSection, isOpen, setIsOpen }: 
           
           {/* Logo */}
           <div className="relative z-10 p-4 border-b border-emerald-700/30">
-            <motion.div 
+            <motion.div
               className="flex flex-col items-center"
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <motion.div 
-                className="relative w-32 h-auto mb-2"
-                animate={{ 
+              <motion.div
+                className="relative w-28 h-auto mb-2"
+                animate={{
                   scale: [1, 1.02, 1],
                 }}
                 transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
               >
-                <Image
-                  src="/agriconnect-logo-main.png"
+                <img
+                  src="/logomarca.png"
                   alt="AgriConnect"
-                  width={128}
-                  height={70}
-                  className="w-full h-auto"
-                  priority
+                  className="w-full h-auto drop-shadow-lg"
+                  style={{ mixBlendMode: 'multiply' }}
                 />
               </motion.div>
             </motion.div>

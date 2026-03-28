@@ -1,42 +1,38 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { 
-  Sun, 
-  Cloud, 
-  CloudRain, 
-  Wind, 
-  Droplets, 
+import {
+  Sun,
+  Cloud,
+  CloudRain,
+  Wind,
+  Droplets,
   Thermometer,
-  Calendar
+  Calendar,
+  Loader2,
+  MapPin
 } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Card3D } from './animations'
-
-const currentWeather = {
-  temp: 28,
-  condition: 'Parcialmente Nublado',
-  humidity: 65,
-  wind: 12,
-  uv: 6,
-  icon: 'partial-cloud'
-}
-
-const forecast = [
-  { day: 'Hoje', icon: 'sun', temp: 28, rain: 10 },
-  { day: 'Amanhã', icon: 'cloud', temp: 26, rain: 20 },
-  { day: 'Qua', icon: 'rain', temp: 24, rain: 80 },
-  { day: 'Qui', icon: 'rain', temp: 22, rain: 60 },
-  { day: 'Sex', icon: 'cloud', temp: 25, rain: 30 },
-]
+import { useAgriculturalWeather } from '@/hooks/useAgriculturalWeather'
 
 function WeatherIcon({ type, className }: { type: string; className?: string }) {
   const iconVariants = {
     initial: { scale: 0.8, opacity: 0 },
     animate: { scale: 1, opacity: 1 }
   }
-  
-  switch (type) {
+
+  // Mapeia condições da API para tipos de ícones
+  const getIconType = (condition: string): string => {
+    const conditionLower = condition.toLowerCase()
+    if (conditionLower.includes('sol') || conditionLower.includes('limpo')) return 'sun'
+    if (conditionLower.includes('chuva') || conditionLower.includes('garoa')) return 'rain'
+    if (conditionLower.includes('nublado') || conditionLower.includes('nuvem')) return 'cloud'
+    return 'sun'
+  }
+
+  const iconType = getIconType(type)
+
+  switch (iconType) {
     case 'sun':
       return (
         <motion.svg
@@ -51,7 +47,7 @@ function WeatherIcon({ type, className }: { type: string; className?: string }) 
           initial="initial"
           animate="animate"
         >
-          <motion.circle 
+          <motion.circle
             cx="12" cy="12" r="4"
             animate={{ scale: [1, 1.1, 1] }}
             transition={{ duration: 2, repeat: Infinity }}
@@ -95,39 +91,22 @@ function WeatherIcon({ type, className }: { type: string; className?: string }) 
           className={className}
         >
           <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242" />
-          <motion.path 
-            d="M16 14v6" 
+          <motion.path
+            d="M16 14v6"
             animate={{ y: [0, 2, 0], opacity: [1, 0.5, 1] }}
             transition={{ duration: 1, repeat: Infinity, delay: 0 }}
           />
-          <motion.path 
-            d="M8 14v6" 
+          <motion.path
+            d="M8 14v6"
             animate={{ y: [0, 2, 0], opacity: [1, 0.5, 1] }}
             transition={{ duration: 1, repeat: Infinity, delay: 0.3 }}
           />
-          <motion.path 
-            d="M12 16v6" 
+          <motion.path
+            d="M12 16v6"
             animate={{ y: [0, 2, 0], opacity: [1, 0.5, 1] }}
             transition={{ duration: 1, repeat: Infinity, delay: 0.6 }}
           />
         </motion.svg>
-      )
-    case 'partial-cloud':
-      return (
-        <motion.div
-          className="relative"
-          animate={{ y: [0, -3, 0] }}
-          transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-        >
-          <Sun className={className} />
-          <motion.div
-            className="absolute -bottom-1 -right-1"
-            animate={{ x: [0, 2, 0] }}
-            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
-          >
-            <Cloud className="w-4 h-4 text-gray-400" />
-          </motion.div>
-        </motion.div>
       )
     default:
       return <Sun className={className} />
@@ -135,6 +114,52 @@ function WeatherIcon({ type, className }: { type: string; className?: string }) 
 }
 
 export function WeatherWidget() {
+  const { weather, insights, isLoading, error } = useAgriculturalWeather()
+
+  // Previsão dos próximos dias (mockada por enquanto, pode ser expandida)
+  const forecast = [
+    { day: 'Hoje', icon: weather?.condition || 'sun', temp: weather?.temperature || 28, rain: Math.min(Math.round((weather?.precipitation || 0) * 10), 100) },
+    { day: 'Amanhã', icon: 'cloud', temp: (weather?.temperature || 28) - 2, rain: 20 },
+    { day: 'Qua', icon: 'rain', temp: (weather?.temperature || 28) - 4, rain: 60 },
+    { day: 'Qui', icon: 'cloud', temp: (weather?.temperature || 28) - 1, rain: 30 },
+    { day: 'Sex', icon: 'sun', temp: (weather?.temperature || 28) + 1, rain: 10 },
+  ]
+
+  if (isLoading) {
+    return (
+      <Card className="border-0 shadow-md overflow-hidden">
+        <CardHeader className="pb-2 bg-gradient-to-r from-white to-gray-50">
+          <CardTitle className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+            <Calendar className="w-5 h-5 text-emerald-600" />
+            Clima
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-8 flex items-center justify-center">
+          <Loader2 className="w-8 h-8 text-emerald-600 animate-spin" />
+        </CardContent>
+      </Card>
+    )
+  }
+
+  if (error || !weather) {
+    return (
+      <Card className="border-0 shadow-md overflow-hidden">
+        <CardHeader className="pb-2 bg-gradient-to-r from-white to-gray-50">
+          <CardTitle className="text-lg font-semibold text-gray-800 flex items-center gap-2">
+            <Calendar className="w-5 h-5 text-emerald-600" />
+            Clima
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="p-6">
+          <div className="text-center text-gray-500">
+            <Cloud className="w-12 h-12 mx-auto mb-2 text-gray-400" />
+            <p className="text-sm">Não foi possível carregar os dados do clima</p>
+          </div>
+        </CardContent>
+      </Card>
+    )
+  }
+
   return (
     <Card className="border-0 shadow-md overflow-hidden">
       <CardHeader className="pb-2 bg-gradient-to-r from-white to-gray-50">
@@ -150,49 +175,52 @@ export function WeatherWidget() {
       </CardHeader>
       <CardContent className="space-y-4">
         {/* Current Weather */}
-        <motion.div 
+        <motion.div
           className="flex items-center justify-between p-4 bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 rounded-xl relative overflow-hidden"
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.5 }}
         >
           {/* Animated sun rays */}
-          <motion.div 
+          <motion.div
             className="absolute -right-8 -top-8 w-24 h-24 bg-amber-200/30 rounded-full blur-2xl"
-            animate={{ 
+            animate={{
               scale: [1, 1.3, 1],
               opacity: [0.3, 0.5, 0.3]
             }}
             transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
           />
-          
+
           <div className="relative z-10">
-            <motion.p 
+            <motion.p
               className="text-4xl font-bold text-gray-800"
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: 'spring', stiffness: 200 }}
             >
-              {currentWeather.temp}°C
+              {weather.temperature}°C
             </motion.p>
-            <p className="text-sm text-gray-600">{currentWeather.condition}</p>
-            <p className="text-xs text-gray-400 mt-1">São Paulo, SP</p>
+            <p className="text-sm text-gray-600">{weather.condition}</p>
+            <div className="flex items-center gap-1 text-xs text-gray-400 mt-1">
+              <MapPin className="w-3 h-3" />
+              <span>São Paulo, SP</span>
+            </div>
           </div>
           <motion.div
             className="text-amber-500 relative z-10"
             animate={{ rotate: [0, 5, -5, 0] }}
             transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
           >
-            <WeatherIcon type={currentWeather.icon} className="w-16 h-16" />
+            <WeatherIcon type={weather.condition} className="w-16 h-16" />
           </motion.div>
         </motion.div>
 
         {/* Weather Details */}
         <div className="grid grid-cols-3 gap-2">
           {[
-            { icon: Droplets, value: `${currentWeather.humidity}%`, label: 'Umidade', color: 'sky' },
-            { icon: Wind, value: `${currentWeather.wind}km/h`, label: 'Vento', color: 'gray' },
-            { icon: Thermometer, value: currentWeather.uv, label: 'UV', color: 'orange' }
+            { icon: Droplets, value: `${weather.humidity}%`, label: 'Umidade', color: 'sky' },
+            { icon: Wind, value: `${weather.windSpeed}km/h`, label: 'Vento', color: 'gray' },
+            { icon: Thermometer, value: weather.uvIndex, label: 'UV', color: 'orange' }
           ].map((item, index) => {
             const Icon = item.icon
             const colors: Record<string, string> = {
@@ -223,6 +251,30 @@ export function WeatherWidget() {
           })}
         </div>
 
+        {/* Insights Agrícolas */}
+        {insights.length > 0 && (
+          <div className="space-y-2">
+            <p className="text-sm font-medium text-gray-600">Alertas para Agricultura</p>
+            {insights.slice(0, 2).map((insight, index) => (
+              <motion.div
+                key={index}
+                className={`p-3 rounded-lg text-xs ${
+                  insight.type === 'warning' ? 'bg-amber-50 text-amber-700 border border-amber-200' :
+                  insight.type === 'alert' ? 'bg-rose-50 text-rose-700 border border-rose-200' :
+                  insight.type === 'success' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' :
+                  'bg-sky-50 text-sky-700 border border-sky-200'
+                }`}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: index * 0.15 }}
+              >
+                <p className="font-semibold">{insight.title}</p>
+                <p className="mt-0.5">{insight.recommendation}</p>
+              </motion.div>
+            ))}
+          </div>
+        )}
+
         {/* Forecast */}
         <div>
           <p className="text-sm font-medium text-gray-600 mb-3">Previsão</p>
@@ -237,12 +289,12 @@ export function WeatherWidget() {
                 whileHover={{ scale: 1.1, y: -3 }}
               >
                 <span className="text-xs font-medium text-gray-500">{day.day}</span>
-                <WeatherIcon 
-                  type={day.icon} 
-                  className="w-5 h-5 text-gray-600" 
+                <WeatherIcon
+                  type={day.icon}
+                  className="w-5 h-5 text-gray-600"
                 />
                 <span className="text-sm font-bold text-gray-800">{day.temp}°</span>
-                <motion.span 
+                <motion.span
                   className="text-xs text-sky-500"
                   animate={{ opacity: [0.5, 1, 0.5] }}
                   transition={{ duration: 1.5, repeat: Infinity, delay: index * 0.2 }}
