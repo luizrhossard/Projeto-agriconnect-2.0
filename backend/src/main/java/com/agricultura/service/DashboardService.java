@@ -1,12 +1,5 @@
 package com.agricultura.service;
 
-import com.agricultura.dto.*;
-import com.agricultura.repository.CulturaRepository;
-import com.agricultura.repository.TarefaRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -14,6 +7,15 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.agricultura.dto.*;
+import com.agricultura.repository.CulturaRepository;
+import com.agricultura.repository.TarefaRepository;
+
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -29,17 +31,15 @@ public class DashboardService {
         List<CulturaResponse> culturas = culturaService.findAll(userId);
         List<TarefaResponse> tarefas = tarefaService.findAll(userId);
 
-        long tarefasPendentes = tarefas.stream()
-                .filter(t -> "PENDENTE".equals(t.getStatus()))
-                .count();
+        long tarefasPendentes =
+                tarefas.stream().filter(t -> "PENDENTE".equals(t.getStatus())).count();
 
         long tarefasEmAndamento = tarefas.stream()
                 .filter(t -> "EM_ANDAMENTO".equals(t.getStatus()))
                 .count();
 
-        long tarefasConcluidas = tarefas.stream()
-                .filter(t -> "CONCLUIDA".equals(t.getStatus()))
-                .count();
+        long tarefasConcluidas =
+                tarefas.stream().filter(t -> "CONCLUIDA".equals(t.getStatus())).count();
 
         List<TarefaResponse> tarefasPendentesList = tarefas.stream()
                 .filter(t -> "PENDENTE".equals(t.getStatus()) || "EM_ANDAMENTO".equals(t.getStatus()))
@@ -71,28 +71,25 @@ public class DashboardService {
                 .build();
     }
 
-    private MetricasAgricolas calcularMetricasAgricolas(
-            List<CulturaResponse> culturas, 
-            List<TarefaResponse> tarefas) {
-        
+    private MetricasAgricolas calcularMetricasAgricolas(List<CulturaResponse> culturas, List<TarefaResponse> tarefas) {
+
         MetricasAgricolas metricas = new MetricasAgricolas();
-        
+
         if (culturas.isEmpty()) {
             return metricas;
         }
 
         // Calcular área total
-        BigDecimal areaTotal = culturas.stream()
-                .map(CulturaResponse::getArea)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal areaTotal = culturas.stream().map(CulturaResponse::getArea).reduce(BigDecimal.ZERO, BigDecimal::add);
 
         // Produtividade média (baseada no status e progresso das culturas)
         BigDecimal somaProdutividade = culturas.stream()
                 .map(cultura -> {
                     // Estimativa baseada no progresso e status
                     int progresso = cultura.getProgress() != null ? cultura.getProgress() : 50;
-                    String status = cultura.getStatus() != null ? cultura.getStatus().toLowerCase() : "";
-                    
+                    String status =
+                            cultura.getStatus() != null ? cultura.getStatus().toLowerCase() : "";
+
                     // Fator de produtividade baseado no status
                     BigDecimal fator = BigDecimal.valueOf(1.0);
                     if (status.contains("finalizada") || status.contains("colheita")) {
@@ -100,34 +97,31 @@ public class DashboardService {
                     } else if (status.contains("crescendo")) {
                         fator = BigDecimal.valueOf(progresso / 100.0).add(BigDecimal.valueOf(0.5));
                     }
-                    
+
                     return fator.multiply(BigDecimal.valueOf(2.5)); // Base 2.5 ton/ha
                 })
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
-        metricas.produtividadeMedia = somaProdutividade
-                .divide(BigDecimal.valueOf(culturas.size()), 1, BigDecimal.ROUND_HALF_UP);
-        
+        metricas.produtividadeMedia =
+                somaProdutividade.divide(BigDecimal.valueOf(culturas.size()), 1, BigDecimal.ROUND_HALF_UP);
+
         // Variação de produtividade (aleatória baseada em fatores)
-        metricas.variacaoProdutividade = BigDecimal.valueOf(Math.random() * 15 - 3)
-                .setScale(1, BigDecimal.ROUND_HALF_UP);
+        metricas.variacaoProdutividade =
+                BigDecimal.valueOf(Math.random() * 15 - 3).setScale(1, BigDecimal.ROUND_HALF_UP);
 
         // Eficiência hídrica (baseada em tarefas de irrigação)
         long tarefasIrrigacao = tarefas.stream()
                 .filter(t -> t.getTitulo().toLowerCase().contains("irrig"))
                 .count();
-        
+
         BigDecimal eficienciaBase = BigDecimal.valueOf(85);
         if (tarefasIrrigacao > 0) {
-            eficienciaBase = eficienciaBase.add(
-                BigDecimal.valueOf(Math.min(tarefasIrrigacao * 2, 10))
-            );
+            eficienciaBase = eficienciaBase.add(BigDecimal.valueOf(Math.min(tarefasIrrigacao * 2, 10)));
         }
         metricas.eficienciaHidrica = eficienciaBase.min(BigDecimal.valueOf(98));
-        
+
         // Variação do uso de água
-        metricas.variacaoUsoAgua = BigDecimal.valueOf(Math.random() * 8 - 2)
-                .setScale(1, BigDecimal.ROUND_HALF_UP);
+        metricas.variacaoUsoAgua = BigDecimal.valueOf(Math.random() * 8 - 2).setScale(1, BigDecimal.ROUND_HALF_UP);
 
         // Custo por hectare (calculado baseado nas atividades)
         BigDecimal custoBase = BigDecimal.valueOf(2000);
@@ -135,18 +129,17 @@ public class DashboardService {
                 .filter(t -> t.getTitulo().toLowerCase().contains("fertil"))
                 .count();
         long tarefasTratos = tarefas.stream()
-                .filter(t -> t.getTitulo().toLowerCase().contains("praga") || 
-                            t.getTitulo().toLowerCase().contains("tratos"))
+                .filter(t -> t.getTitulo().toLowerCase().contains("praga")
+                        || t.getTitulo().toLowerCase().contains("tratos"))
                 .count();
-        
-        BigDecimal custoAdicional = BigDecimal.valueOf(tarefasFertilizante * 50)
-                .add(BigDecimal.valueOf(tarefasTratos * 30));
-        
+
+        BigDecimal custoAdicional =
+                BigDecimal.valueOf(tarefasFertilizante * 50).add(BigDecimal.valueOf(tarefasTratos * 30));
+
         metricas.custoPorHectare = custoBase.add(custoAdicional);
-        
+
         // Variação de custo
-        metricas.variacaoCusto = BigDecimal.valueOf(Math.random() * -10)
-                .setScale(1, BigDecimal.ROUND_HALF_UP);
+        metricas.variacaoCusto = BigDecimal.valueOf(Math.random() * -10).setScale(1, BigDecimal.ROUND_HALF_UP);
 
         // Área colhida (culturas finalizadas)
         metricas.areaColhida = culturas.stream()
@@ -156,16 +149,15 @@ public class DashboardService {
                 })
                 .map(CulturaResponse::getArea)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-        
+
         // Se não houver área colhida, usa uma porcentagem da área total
         if (metricas.areaColhida.compareTo(BigDecimal.ZERO) == 0) {
-            metricas.areaColhida = areaTotal.multiply(BigDecimal.valueOf(0.7))
-                    .setScale(0, BigDecimal.ROUND_HALF_UP);
+            metricas.areaColhida = areaTotal.multiply(BigDecimal.valueOf(0.7)).setScale(0, BigDecimal.ROUND_HALF_UP);
         }
-        
+
         // Variação da área colhida
-        metricas.variacaoAreaColhida = BigDecimal.valueOf(Math.random() * 20 + 5)
-                .setScale(0, BigDecimal.ROUND_HALF_UP);
+        metricas.variacaoAreaColhida =
+                BigDecimal.valueOf(Math.random() * 20 + 5).setScale(0, BigDecimal.ROUND_HALF_UP);
 
         return metricas;
     }
@@ -182,9 +174,8 @@ public class DashboardService {
     }
 
     private List<AtividadeRecenteResponse> gerarAtividadesRecentes(
-            List<CulturaResponse> culturas, 
-            List<TarefaResponse> tarefas) {
-        
+            List<CulturaResponse> culturas, List<TarefaResponse> tarefas) {
+
         List<AtividadeRecenteResponse> atividades = new ArrayList<>();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMM");
 
@@ -193,16 +184,17 @@ public class DashboardService {
             String tipoAtividade = getTipoAtividade(cultura.getStatus());
             String iconeTipo = getIconePorTipoAtividade("CULTURA", tipoAtividade);
             String corFundo = getCorFundoPorTipo(iconeTipo);
-            
+
             atividades.add(AtividadeRecenteResponse.builder()
                     .tipo("CULTURA")
                     .titulo(tipoAtividade)
                     .descricao(cultura.getNome())
                     .culturaNome(cultura.getNome())
                     .area(cultura.getArea() + " ha")
-                    .data(cultura.getDataPlantio() != null ? 
-                        cultura.getDataPlantio().format(formatter) : 
-                        LocalDate.now().format(formatter))
+                    .data(
+                            cultura.getDataPlantio() != null
+                                    ? cultura.getDataPlantio().format(formatter)
+                                    : LocalDate.now().format(formatter))
                     .icone(iconeTipo)
                     .corFundo(corFundo)
                     .status(cultura.getStatus())
@@ -214,16 +206,17 @@ public class DashboardService {
             String tipoAtividade = getTipoAtividadeTarefa(tarefa.getTitulo());
             String iconeTipo = getIconePorTipoAtividade("TAREFA", tipoAtividade);
             String corFundo = getCorFundoPorTipo(iconeTipo);
-            
+
             atividades.add(AtividadeRecenteResponse.builder()
                     .tipo("TAREFA")
                     .titulo(tipoAtividade)
                     .descricao(tarefa.getTitulo())
                     .culturaNome(tarefa.getCulturaNome())
                     .area(tarefa.getCulturaNome() != null ? "" : "")
-                    .data(tarefa.getDataVencimento() != null ? 
-                        tarefa.getDataVencimento().format(formatter) : 
-                        LocalDate.now().format(formatter))
+                    .data(
+                            tarefa.getDataVencimento() != null
+                                    ? tarefa.getDataVencimento().format(formatter)
+                                    : LocalDate.now().format(formatter))
                     .icone(iconeTipo)
                     .corFundo(corFundo)
                     .status(tarefa.getStatus())
@@ -282,17 +275,17 @@ public class DashboardService {
 
     private String getIconePorTipoAtividade(String tipo, String titulo) {
         if (tipo == null || titulo == null) return "seedling";
-        
+
         String tituloLower = titulo.toLowerCase();
         String tipoLower = tipo.toLowerCase();
-        
+
         if (tipoLower.equals("cultura")) {
             if (tituloLower.contains("plantio")) return "seedling";
             if (tituloLower.contains("colheita")) return "wheat";
             if (tituloLower.contains("tratos")) return "flask";
             if (tituloLower.contains("finalizada")) return "check-circle";
         }
-        
+
         if (tipoLower.equals("tarefa")) {
             if (tituloLower.contains("irrig")) return "droplet";
             if (tituloLower.contains("fertil")) return "flask-conical";
@@ -301,7 +294,7 @@ public class DashboardService {
             if (tituloLower.contains("colheita")) return "package";
             if (tituloLower.contains("plantio")) return "seedling";
         }
-        
+
         return "circle-dot";
     }
 

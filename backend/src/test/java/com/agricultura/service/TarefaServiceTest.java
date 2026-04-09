@@ -1,5 +1,20 @@
 package com.agricultura.service;
 
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
+
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
 import com.agricultura.domain.Cultura;
 import com.agricultura.domain.Tarefa;
 import com.agricultura.domain.Usuario;
@@ -8,20 +23,6 @@ import com.agricultura.dto.TarefaResponse;
 import com.agricultura.repository.CulturaRepository;
 import com.agricultura.repository.TarefaRepository;
 import com.agricultura.repository.UsuarioRepository;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
-
-import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class TarefaServiceTest {
@@ -34,6 +35,9 @@ class TarefaServiceTest {
 
     @Mock
     private UsuarioRepository usuarioRepository;
+
+    @Mock
+    private NotificacaoService notificacaoService;
 
     @InjectMocks
     private TarefaService tarefaService;
@@ -50,10 +54,7 @@ class TarefaServiceTest {
                 .email("test@example.com")
                 .build();
 
-        cultura = Cultura.builder()
-                .id(1L)
-                .nome("Milho")
-                .build();
+        cultura = Cultura.builder().id(1L).nome("Milho").build();
 
         tarefa = Tarefa.builder()
                 .id(1L)
@@ -117,6 +118,7 @@ class TarefaServiceTest {
             t.setId(2L);
             return t;
         });
+        doNothing().when(notificacaoService).criarNotificacao(anyLong(), anyString(), anyString(), anyString());
 
         TarefaResponse result = tarefaService.create(request, 1L);
 
@@ -139,6 +141,7 @@ class TarefaServiceTest {
             t.setId(2L);
             return t;
         });
+        doNothing().when(notificacaoService).criarNotificacao(anyLong(), anyString(), anyString(), anyString());
 
         TarefaResponse result = tarefaService.create(request, 1L);
 

@@ -1,17 +1,19 @@
 package com.agricultura.service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.agricultura.domain.Cultura;
 import com.agricultura.domain.Usuario;
 import com.agricultura.dto.CulturaRequest;
 import com.agricultura.dto.CulturaResponse;
 import com.agricultura.repository.CulturaRepository;
 import com.agricultura.repository.UsuarioRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -29,20 +31,20 @@ public class CulturaService {
 
     @Transactional(readOnly = true)
     public CulturaResponse findById(Long id, Long userId) {
-        Cultura cultura = culturaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Cultura não encontrada"));
-        
+        Cultura cultura =
+                culturaRepository.findById(id).orElseThrow(() -> new RuntimeException("Cultura não encontrada"));
+
         if (!cultura.getUser().getId().equals(userId)) {
             throw new RuntimeException("Acesso negado a esta cultura");
         }
-        
+
         return toResponse(cultura);
     }
 
     @Transactional
     public CulturaResponse create(CulturaRequest request, Long userId) {
-        Usuario usuario = usuarioRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+        Usuario usuario =
+                usuarioRepository.findById(userId).orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
 
         Cultura cultura = Cultura.builder()
                 .nome(request.getNome())
@@ -62,8 +64,8 @@ public class CulturaService {
 
     @Transactional
     public CulturaResponse update(Long id, CulturaRequest request, Long userId) {
-        Cultura cultura = culturaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Cultura não encontrada"));
+        Cultura cultura =
+                culturaRepository.findById(id).orElseThrow(() -> new RuntimeException("Cultura não encontrada"));
 
         if (!cultura.getUser().getId().equals(userId)) {
             throw new RuntimeException("Acesso negado a esta cultura");
@@ -90,13 +92,13 @@ public class CulturaService {
 
     @Transactional
     public void delete(Long id, Long userId) {
-        Cultura cultura = culturaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Cultura não encontrada"));
-        
+        Cultura cultura =
+                culturaRepository.findById(id).orElseThrow(() -> new RuntimeException("Cultura não encontrada"));
+
         if (!cultura.getUser().getId().equals(userId)) {
             throw new RuntimeException("Acesso negado a esta cultura");
         }
-        
+
         culturaRepository.delete(cultura);
     }
 

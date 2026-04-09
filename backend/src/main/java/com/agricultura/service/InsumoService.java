@@ -1,5 +1,14 @@
 package com.agricultura.service;
 
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.agricultura.domain.Insumo;
 import com.agricultura.domain.MovimentoEstoque;
 import com.agricultura.domain.Usuario;
@@ -11,15 +20,8 @@ import com.agricultura.exception.ResourceNotFoundException;
 import com.agricultura.repository.InsumoRepository;
 import com.agricultura.repository.MovimentoEstoqueRepository;
 import com.agricultura.repository.UsuarioRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -30,26 +32,26 @@ public class InsumoService {
     private final UsuarioRepository usuarioRepository;
 
     public List<InsumoResponse> findAll(Long userId) {
-        return insumoRepository.findByUserIdAndAtivoTrue(userId)
-                .stream()
+        return insumoRepository.findByUserIdAndAtivoTrue(userId).stream()
                 .map(this::toResponse)
                 .collect(Collectors.toList());
     }
 
     public InsumoResponse findById(Long id, Long userId) {
-        Insumo insumo = insumoRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Insumo não encontrado"));
-        
+        Insumo insumo =
+                insumoRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Insumo não encontrado"));
+
         if (!insumo.getUser().getId().equals(userId)) {
             throw new RuntimeException("Acesso negado");
         }
-        
+
         return toResponse(insumo);
     }
 
     @Transactional
     public InsumoResponse create(InsumoRequest request, Long userId) {
-        Usuario usuario = usuarioRepository.findById(userId)
+        Usuario usuario = usuarioRepository
+                .findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
 
         Insumo insumo = Insumo.builder()
@@ -77,8 +79,8 @@ public class InsumoService {
 
     @Transactional
     public InsumoResponse update(Long id, InsumoRequest request, Long userId) {
-        Insumo insumo = insumoRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Insumo não encontrado"));
+        Insumo insumo =
+                insumoRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Insumo não encontrado"));
 
         if (!insumo.getUser().getId().equals(userId)) {
             throw new RuntimeException("Acesso negado");
@@ -89,7 +91,8 @@ public class InsumoService {
         insumo.setPrecoUnitario(request.getPrecoUnitario());
         insumo.setDataValidade(request.getDataValidade());
         insumo.setFornecedor(request.getFornecedor());
-        insumo.setEstoqueMinimo(request.getEstoqueMinimo() != null ? request.getEstoqueMinimo() : BigDecimal.valueOf(10));
+        insumo.setEstoqueMinimo(
+                request.getEstoqueMinimo() != null ? request.getEstoqueMinimo() : BigDecimal.valueOf(10));
 
         insumo = insumoRepository.save(insumo);
         return toResponse(insumo);
@@ -97,8 +100,8 @@ public class InsumoService {
 
     @Transactional
     public void delete(Long id, Long userId) {
-        Insumo insumo = insumoRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Insumo não encontrado"));
+        Insumo insumo =
+                insumoRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Insumo não encontrado"));
 
         if (!insumo.getUser().getId().equals(userId)) {
             throw new RuntimeException("Acesso negado");
@@ -110,23 +113,31 @@ public class InsumoService {
 
     @Transactional
     public MovimentoEstoqueResponse registrarMovimento(MovimentoEstoqueRequest request, Long userId) {
-        Insumo insumo = insumoRepository.findById(request.getInsumoId())
+        Insumo insumo = insumoRepository
+                .findById(request.getInsumoId())
                 .orElseThrow(() -> new ResourceNotFoundException("Insumo não encontrado"));
 
         if (!insumo.getUser().getId().equals(userId)) {
             throw new RuntimeException("Acesso negado");
         }
 
-        Usuario usuario = usuarioRepository.findById(userId)
+        Usuario usuario = usuarioRepository
+                .findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
 
-        return registrarMovimento(insumo, usuario, request.getTipo(), request.getQuantidade(), request.getMotivo(), request.getResponsavel());
+        return registrarMovimento(
+                insumo,
+                usuario,
+                request.getTipo(),
+                request.getQuantidade(),
+                request.getMotivo(),
+                request.getResponsavel());
     }
 
-    private MovimentoEstoqueResponse registrarMovimento(Insumo insumo, Usuario usuario, String tipo, 
-                                                        BigDecimal quantidade, String motivo, String responsavel) {
+    private MovimentoEstoqueResponse registrarMovimento(
+            Insumo insumo, Usuario usuario, String tipo, BigDecimal quantidade, String motivo, String responsavel) {
         BigDecimal quantidadeAnterior = insumo.getQuantidade();
-        
+
         if ("ENTRADA".equals(tipo)) {
             insumo.setQuantidade(insumo.getQuantidade().add(quantidade));
         } else if ("SAIDA".equals(tipo)) {
@@ -155,18 +166,15 @@ public class InsumoService {
     }
 
     public Page<MovimentoEstoqueResponse> findMovimentosByInsumo(Long insumoId, Pageable pageable) {
-        return movimentoEstoqueRepository.findByInsumoId(insumoId, pageable)
-                .map(this::toResponse);
+        return movimentoEstoqueRepository.findByInsumoId(insumoId, pageable).map(this::toResponse);
     }
 
     public Page<MovimentoEstoqueResponse> findMovimentosByUser(Long userId, Pageable pageable) {
-        return movimentoEstoqueRepository.findByUserId(userId, pageable)
-                .map(this::toResponse);
+        return movimentoEstoqueRepository.findByUserId(userId, pageable).map(this::toResponse);
     }
 
     public List<InsumoResponse> findEstoqueBaixo(Long userId) {
-        return insumoRepository.findByUserIdAndQuantidadeLessThanEqual(userId, BigDecimal.valueOf(10))
-                .stream()
+        return insumoRepository.findByUserIdAndQuantidadeLessThanEqual(userId, BigDecimal.valueOf(10)).stream()
                 .map(this::toResponse)
                 .collect(Collectors.toList());
     }

@@ -1,9 +1,10 @@
 package com.agricultura.domain;
 
-import jakarta.persistence.*;
-import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+
+import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
 @Table(name = "preco_mercado")

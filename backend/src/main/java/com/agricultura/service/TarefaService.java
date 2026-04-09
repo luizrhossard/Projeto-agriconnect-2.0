@@ -1,5 +1,11 @@
 package com.agricultura.service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.agricultura.domain.Cultura;
 import com.agricultura.domain.Tarefa;
 import com.agricultura.domain.Usuario;
@@ -8,12 +14,8 @@ import com.agricultura.dto.TarefaResponse;
 import com.agricultura.repository.CulturaRepository;
 import com.agricultura.repository.TarefaRepository;
 import com.agricultura.repository.UsuarioRepository;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -33,21 +35,20 @@ public class TarefaService {
 
     @Transactional(readOnly = true)
     public TarefaResponse findById(Long id, Long userId) {
-        Tarefa tarefa = tarefaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Tarefa não encontrada"));
-        
+        Tarefa tarefa = tarefaRepository.findById(id).orElseThrow(() -> new RuntimeException("Tarefa não encontrada"));
+
         if (!tarefa.getUser().getId().equals(userId)) {
             throw new RuntimeException("Acesso negado a esta tarefa");
         }
-        
+
         return toResponse(tarefa);
     }
 
     @Transactional
     public TarefaResponse create(TarefaRequest request, Long userId) {
-        Usuario usuario = usuarioRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
-        
+        Usuario usuario =
+                usuarioRepository.findById(userId).orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
         Tarefa tarefa = Tarefa.builder()
                 .titulo(request.getTitulo())
                 .descricao(request.getDescricao())
@@ -56,34 +57,29 @@ public class TarefaService {
                 .dataVencimento(request.getDataVencimento())
                 .user(usuario)
                 .build();
-        
+
         if (request.getCulturaId() != null) {
-            Cultura cultura = culturaRepository.findById(request.getCulturaId())
+            Cultura cultura = culturaRepository
+                    .findById(request.getCulturaId())
                     .orElseThrow(() -> new RuntimeException("Cultura não encontrada"));
             tarefa.setCultura(cultura);
         }
-        
+
         tarefa = tarefaRepository.save(tarefa);
-        
-        notificacaoService.criarNotificacao(
-            userId,
-            "Nova tarefa criada",
-            tarefa.getTitulo(),
-            "INFO"
-        );
-        
+
+        notificacaoService.criarNotificacao(userId, "Nova tarefa criada", tarefa.getTitulo(), "INFO");
+
         return toResponse(tarefa);
     }
 
     @Transactional
     public TarefaResponse update(Long id, TarefaRequest request, Long userId) {
-        Tarefa tarefa = tarefaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Tarefa não encontrada"));
-        
+        Tarefa tarefa = tarefaRepository.findById(id).orElseThrow(() -> new RuntimeException("Tarefa não encontrada"));
+
         if (!tarefa.getUser().getId().equals(userId)) {
             throw new RuntimeException("Acesso negado a esta tarefa");
         }
-        
+
         tarefa.setTitulo(request.getTitulo());
         tarefa.setDescricao(request.getDescricao());
         if (request.getPrioridade() != null) {
@@ -94,27 +90,24 @@ public class TarefaService {
             tarefa.setStatus(request.getStatus());
         }
         tarefa.setDataVencimento(request.getDataVencimento());
-        
+
         if (request.getCulturaId() != null) {
-            Cultura cultura = culturaRepository.findById(request.getCulturaId())
+            Cultura cultura = culturaRepository
+                    .findById(request.getCulturaId())
                     .orElseThrow(() -> new RuntimeException("Cultura não encontrada"));
             tarefa.setCultura(cultura);
         } else {
             tarefa.setCultura(null);
         }
-        
+
         tarefa = tarefaRepository.save(tarefa);
-        
-        if (request.getStatus() != null && "CONCLUIDA".equals(request.getStatus()) 
-            && !request.getStatus().equals(statusAnterior)) {
-            notificacaoService.criarNotificacao(
-                userId,
-                "Tarefa concluída",
-                tarefa.getTitulo(),
-                "SUCESSO"
-            );
+
+        if (request.getStatus() != null
+                && "CONCLUIDA".equals(request.getStatus())
+                && !request.getStatus().equals(statusAnterior)) {
+            notificacaoService.criarNotificacao(userId, "Tarefa concluída", tarefa.getTitulo(), "SUCESSO");
         }
-        
+
         return toResponse(tarefa);
     }
 
@@ -125,13 +118,12 @@ public class TarefaService {
 
     @Transactional
     public void delete(Long id, Long userId) {
-        Tarefa tarefa = tarefaRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Tarefa não encontrada"));
-        
+        Tarefa tarefa = tarefaRepository.findById(id).orElseThrow(() -> new RuntimeException("Tarefa não encontrada"));
+
         if (!tarefa.getUser().getId().equals(userId)) {
             throw new RuntimeException("Acesso negado a esta tarefa");
         }
-        
+
         tarefaRepository.delete(tarefa);
     }
 

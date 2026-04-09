@@ -1,14 +1,16 @@
 package com.agricultura.controller;
 
-import com.agricultura.dto.*;
-import com.agricultura.service.AuthService;
-import com.agricultura.service.PrecoMercadoService;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import com.agricultura.dto.*;
+import com.agricultura.service.AuthService;
+import com.agricultura.service.PrecoMercadoService;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/precos")
@@ -37,7 +39,8 @@ public class PrecoMercadoController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<PrecoMercadoResponse> update(@PathVariable Long id, @Valid @RequestBody PrecoMercadoRequest request) {
+    public ResponseEntity<PrecoMercadoResponse> update(
+            @PathVariable Long id, @Valid @RequestBody PrecoMercadoRequest request) {
         Long userId = authService.getCurrentUser().getId();
         return ResponseEntity.ok(precoMercadoService.update(id, request, userId));
     }

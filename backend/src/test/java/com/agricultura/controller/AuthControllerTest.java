@@ -1,14 +1,10 @@
 package com.agricultura.controller;
 
-import com.agricultura.dto.AuthResponse;
-import com.agricultura.dto.LoginRequest;
-import com.agricultura.dto.RegisterRequest;
-import com.agricultura.dto.UsuarioResponse;
-import com.agricultura.security.JwtAuthenticationFilter;
-import com.agricultura.security.JwtService;
-import com.agricultura.service.AuthService;
-import com.agricultura.service.UsuarioService;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -18,10 +14,15 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import com.agricultura.dto.AuthResponse;
+import com.agricultura.dto.LoginRequest;
+import com.agricultura.dto.RegisterRequest;
+import com.agricultura.dto.UsuarioResponse;
+import com.agricultura.security.JwtAuthenticationFilter;
+import com.agricultura.security.JwtService;
+import com.agricultura.service.AuthService;
+import com.agricultura.service.UsuarioService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @WebMvcTest(AuthController.class)
 @AutoConfigureMockMvc(addFilters = false)

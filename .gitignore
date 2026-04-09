@@ -4,3 +4,18 @@ backend/target/
 backend/nul
 *.class
 *.log
+
+# Environment variables (exceto exemplos/template)
+.env
+.env.local
+.env.*.local
+!*.example
+
+# IDE
+.vscode/
+.idea/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db

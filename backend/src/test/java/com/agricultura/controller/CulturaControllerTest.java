@@ -1,13 +1,15 @@
 package com.agricultura.controller;
 
-import com.agricultura.dto.CulturaRequest;
-import com.agricultura.dto.CulturaResponse;
-import com.agricultura.security.JwtAuthenticationFilter;
-import com.agricultura.security.JwtService;
-import com.agricultura.service.AuthService;
-import com.agricultura.service.CulturaService;
-import com.agricultura.domain.Usuario;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,16 +20,14 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import com.agricultura.domain.Usuario;
+import com.agricultura.dto.CulturaRequest;
+import com.agricultura.dto.CulturaResponse;
+import com.agricultura.security.JwtAuthenticationFilter;
+import com.agricultura.security.JwtService;
+import com.agricultura.service.AuthService;
+import com.agricultura.service.CulturaService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @WebMvcTest(CulturaController.class)
 @AutoConfigureMockMvc(addFilters = false)
@@ -79,7 +79,7 @@ class CulturaControllerTest {
     @Test
     void findAll_Success() throws Exception {
         when(culturaService.findAll(1L)).thenReturn(List.of(culturaResponse));
-        
+
         when(authService.getCurrentUser()).thenReturn(usuarioEntity);
 
         mockMvc.perform(get("/api/culturas"))
@@ -90,7 +90,7 @@ class CulturaControllerTest {
     @Test
     void findById_Success() throws Exception {
         when(culturaService.findById(1L, 1L)).thenReturn(culturaResponse);
-        
+
         when(authService.getCurrentUser()).thenReturn(usuarioEntity);
 
         mockMvc.perform(get("/api/culturas/1"))
@@ -122,8 +122,7 @@ class CulturaControllerTest {
         request.setArea(15.0);
         request.setDataPlantio(LocalDate.now());
 
-        when(culturaService.update(eq(1L), any(CulturaRequest.class), eq(1L)))
-                .thenReturn(culturaResponse);
+        when(culturaService.update(eq(1L), any(CulturaRequest.class), eq(1L))).thenReturn(culturaResponse);
 
         when(authService.getCurrentUser()).thenReturn(usuarioEntity);
 
@@ -136,8 +135,7 @@ class CulturaControllerTest {
     @Test
     void delete_Success() throws Exception {
         when(authService.getCurrentUser()).thenReturn(usuarioEntity);
-        
-        mockMvc.perform(delete("/api/culturas/1"))
-                .andExpect(status().isNoContent());
+
+        mockMvc.perform(delete("/api/culturas/1")).andExpect(status().isNoContent());
     }
 }

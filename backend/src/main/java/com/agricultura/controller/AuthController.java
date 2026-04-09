@@ -1,14 +1,14 @@
 package com.agricultura.controller;
 
-import com.agricultura.dto.*;
-import com.agricultura.service.AuthService;
-import com.agricultura.service.UsuarioService;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import com.agricultura.dto.*;
+import com.agricultura.service.AuthService;
+import com.agricultura.service.UsuarioService;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/auth")

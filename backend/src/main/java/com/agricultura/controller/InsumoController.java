@@ -1,17 +1,19 @@
 package com.agricultura.controller;
 
-import com.agricultura.dto.*;
-import com.agricultura.service.InsumoService;
-import com.agricultura.service.AuthService;
-import jakarta.validation.Valid;
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
+import com.agricultura.dto.*;
+import com.agricultura.service.AuthService;
+import com.agricultura.service.InsumoService;
+
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/insumos")
@@ -59,15 +61,15 @@ public class InsumoController {
     }
 
     @PostMapping("/movimento")
-    public ResponseEntity<MovimentoEstoqueResponse> registrarMovimento(@Valid @RequestBody MovimentoEstoqueRequest request) {
+    public ResponseEntity<MovimentoEstoqueResponse> registrarMovimento(
+            @Valid @RequestBody MovimentoEstoqueRequest request) {
         Long userId = authService.getCurrentUser().getId();
         return ResponseEntity.ok(insumoService.registrarMovimento(request, userId));
     }
 
     @GetMapping("/{id}/movimentos")
     public ResponseEntity<Page<MovimentoEstoqueResponse>> findMovimentosByInsumo(
-            @PathVariable Long id,
-            @PageableDefault(size = 10) Pageable pageable) {
+            @PathVariable Long id, @PageableDefault(size = 10) Pageable pageable) {
         return ResponseEntity.ok(insumoService.findMovimentosByInsumo(id, pageable));
     }
 

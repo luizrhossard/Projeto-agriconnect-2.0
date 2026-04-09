@@ -1,13 +1,16 @@
 package com.agricultura.service;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import com.agricultura.domain.Notificacao;
 import com.agricultura.dto.NotificacaoResponse;
 import com.agricultura.repository.NotificacaoRepository;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -16,15 +19,13 @@ public class NotificacaoService {
     private final NotificacaoRepository notificacaoRepository;
 
     public List<NotificacaoResponse> buscarPorUsuario(Long usuarioId) {
-        return notificacaoRepository.findByUsuarioIdOrderByDataCriacaoDesc(usuarioId)
-                .stream()
+        return notificacaoRepository.findByUsuarioIdOrderByDataCriacaoDesc(usuarioId).stream()
                 .map(this::toResponse)
                 .collect(Collectors.toList());
     }
 
     public List<NotificacaoResponse> buscarNaoLidas(Long usuarioId) {
-        return notificacaoRepository.findByUsuarioIdAndLidaFalseOrderByDataCriacaoDesc(usuarioId)
-                .stream()
+        return notificacaoRepository.findByUsuarioIdAndLidaFalseOrderByDataCriacaoDesc(usuarioId).stream()
                 .map(this::toResponse)
                 .collect(Collectors.toList());
     }
@@ -42,7 +43,7 @@ public class NotificacaoService {
                 .tipo(tipo != null ? tipo : "INFO")
                 .lida(false)
                 .build();
-        
+
         notificacaoRepository.save(notificacao);
     }
 
@@ -56,7 +57,8 @@ public class NotificacaoService {
 
     @Transactional
     public void marcarTodasComoLidas(Long usuarioId) {
-        List<Notificacao> notificacoes = notificacaoRepository.findByUsuarioIdAndLidaFalseOrderByDataCriacaoDesc(usuarioId);
+        List<Notificacao> notificacoes =
+                notificacaoRepository.findByUsuarioIdAndLidaFalseOrderByDataCriacaoDesc(usuarioId);
         notificacoes.forEach(n -> n.setLida(true));
         notificacaoRepository.saveAll(notificacoes);
     }

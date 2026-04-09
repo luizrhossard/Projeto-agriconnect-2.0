@@ -1,13 +1,15 @@
 package com.agricultura.controller;
 
-import com.agricultura.dto.NotificacaoResponse;
-import com.agricultura.service.NotificacaoService;
-import lombok.RequiredArgsConstructor;
+import java.util.List;
+import java.util.Map;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Map;
+import com.agricultura.dto.NotificacaoResponse;
+import com.agricultura.service.NotificacaoService;
+
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/notificacoes")

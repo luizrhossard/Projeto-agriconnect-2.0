@@ -1,7 +1,8 @@
 package com.agricultura.dto;
 
-import lombok.*;
 import java.time.LocalDateTime;
+
+import lombok.*;
 
 @Data
 @Builder

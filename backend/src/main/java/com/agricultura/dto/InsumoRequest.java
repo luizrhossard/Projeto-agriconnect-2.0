@@ -1,9 +1,10 @@
 package com.agricultura.dto;
 
-import jakarta.validation.constraints.*;
-import lombok.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+
+import jakarta.validation.constraints.*;
+import lombok.*;
 
 @Data
 @NoArgsConstructor
@@ -20,8 +21,7 @@ public class InsumoRequest {
     @Builder.Default
     private String tipo = "FERTILIZANTE";
 
-    @NotNull(message = "Quantidade é obrigatória")
-    @DecimalMin(value = "0.00", message = "Quantidade deve ser positiva")
+    @NotNull(message = "Quantidade é obrigatória") @DecimalMin(value = "0.00", message = "Quantidade deve ser positiva")
     @Digits(integer = 8, fraction = 2, message = "Quantidade inválida")
     private BigDecimal quantidade;
 
@@ -30,8 +30,7 @@ public class InsumoRequest {
     @Builder.Default
     private String unidade = "KG";
 
-    @NotNull(message = "Preço unitário é obrigatório")
-    @DecimalMin(value = "0.00", message = "Preço deve ser positivo")
+    @NotNull(message = "Preço unitário é obrigatório") @DecimalMin(value = "0.00", message = "Preço deve ser positivo")
     @Digits(integer = 8, fraction = 2, message = "Preço inválido")
     private BigDecimal precoUnitario;
 
