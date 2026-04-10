@@ -1,0 +1,143 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] ---------------< com.agricultura:projeto-spring-backend >---------------
+[INFO] Building projeto-spring-backend 1.0.0
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] --- jacoco:0.8.11:prepare-agent (default) @ projeto-spring-backend ---
+[INFO] argLine set to -javaagent:C:\\Users\\Usuario\\.m2\\repository\\org\\jacoco\\org.jacoco.agent\\0.8.11\\org.jacoco.agent-0.8.11-runtime.jar=destfile=C:\\Users\\Usuario\\Documents\\java\\spring\\Projeto-spring\\backend\\target\\jacoco.exec
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ projeto-spring-backend ---
+[INFO] Copying 2 resources from src\main\resources to target\classes
+[INFO] Copying 5 resources from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.11.0:compile (default-compile) @ projeto-spring-backend ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ projeto-spring-backend ---
+[INFO] skip non existing resourceDirectory C:\Users\Usuario\Documents\java\spring\Projeto-spring\backend\src\test\resources
+[INFO] 
+[INFO] --- compiler:3.11.0:testCompile (default-testCompile) @ projeto-spring-backend ---
+[INFO] Nothing to compile - all classes are up to date
+[INFO] 
+[INFO] --- surefire:3.1.2:test (default-test) @ projeto-spring-backend ---
+[INFO] Using auto detected provider org.apache.maven.surefire.junitplatform.JUnitPlatformProvider
+[INFO] 
+[INFO] -------------------------------------------------------
+[INFO]  T E S T S
+[INFO] -------------------------------------------------------
+[INFO] Running com.agricultura.controller.AuthControllerTest
+21:15:28.502 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.agricultura.controller.AuthControllerTest]: AuthControllerTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+21:15:28.693 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.agricultura.ProjetoSpringApplication for test class com.agricultura.controller.AuthControllerTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.2.5)
+
+2026-04-09T21:15:29.187-03:00  INFO 11188 --- [projeto-spring-backend] [           main] c.a.controller.AuthControllerTest        : Starting AuthControllerTest using Java 21.0.10 with PID 11188 (started by Luiz in C:\Users\Usuario\Documents\java\spring\Projeto-spring\backend)
+2026-04-09T21:15:29.188-03:00  INFO 11188 --- [projeto-spring-backend] [           main] c.a.controller.AuthControllerTest        : The following 1 profile is active: "dev"
+WARNING: A Java agent has been loaded dynamically (C:\Users\Usuario\.m2\repository\net\bytebuddy\byte-buddy-agent\1.14.13\byte-buddy-agent-1.14.13.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+OpenJDK 64-Bit Server VM warning: Sharing is only supported for boot loader classes because bootstrap classpath has been appended
+2026-04-09T21:15:32.379-03:00  WARN 11188 --- [projeto-spring-backend] [           main] .s.s.UserDetailsServiceAutoConfiguration : 
+
+Using generated security password: 09cec9e7-4c12-41c3-9035-001ba9820702
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2026-04-09T21:15:32.417-03:00  INFO 11188 --- [projeto-spring-backend] [           main] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
+2026-04-09T21:15:32.418-03:00  INFO 11188 --- [projeto-spring-backend] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2026-04-09T21:15:32.420-03:00  INFO 11188 --- [projeto-spring-backend] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 2 ms
+2026-04-09T21:15:32.450-03:00  INFO 11188 --- [projeto-spring-backend] [           main] c.a.controller.AuthControllerTest        : Started AuthControllerTest in 3.658 seconds (process running for 5.008)
+[INFO] Tests run: 4, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 4.745 s -- in com.agricultura.controller.AuthControllerTest
+[INFO] Running com.agricultura.controller.CulturaControllerTest
+2026-04-09T21:15:32.996-03:00  INFO 11188 --- [projeto-spring-backend] [           main] t.c.s.AnnotationConfigContextLoaderUtils : Could not detect default configuration classes for test class [com.agricultura.controller.CulturaControllerTest]: CulturaControllerTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+2026-04-09T21:15:33.014-03:00  INFO 11188 --- [projeto-spring-backend] [           main] .b.t.c.SpringBootTestContextBootstrapper : Found @SpringBootConfiguration com.agricultura.ProjetoSpringApplication for test class com.agricultura.controller.CulturaControllerTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.2.5)
+
+2026-04-09T21:15:33.055-03:00  INFO 11188 --- [projeto-spring-backend] [           main] c.a.controller.CulturaControllerTest     : Starting CulturaControllerTest using Java 21.0.10 with PID 11188 (started by Luiz in C:\Users\Usuario\Documents\java\spring\Projeto-spring\backend)
+2026-04-09T21:15:33.055-03:00  INFO 11188 --- [projeto-spring-backend] [           main] c.a.controller.CulturaControllerTest     : The following 1 profile is active: "dev"
+2026-04-09T21:15:33.448-03:00  WARN 11188 --- [projeto-spring-backend] [           main] .s.s.UserDetailsServiceAutoConfiguration : 
+
+Using generated security password: 5ae5cc43-e8b5-43c1-85f0-f16a08ae457f
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2026-04-09T21:15:33.453-03:00  INFO 11188 --- [projeto-spring-backend] [           main] o.s.b.t.m.w.SpringBootMockServletContext : Initializing Spring TestDispatcherServlet ''
+2026-04-09T21:15:33.454-03:00  INFO 11188 --- [projeto-spring-backend] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Initializing Servlet ''
+2026-04-09T21:15:33.454-03:00  INFO 11188 --- [projeto-spring-backend] [           main] o.s.t.web.servlet.TestDispatcherServlet  : Completed initialization in 0 ms
+2026-04-09T21:15:33.461-03:00  INFO 11188 --- [projeto-spring-backend] [           main] c.a.controller.CulturaControllerTest     : Started CulturaControllerTest in 0.442 seconds (process running for 6.019)
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.574 s -- in com.agricultura.controller.CulturaControllerTest
+[INFO] Running com.agricultura.service.AuthServiceTest
+[INFO] Tests run: 5, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.291 s -- in com.agricultura.service.AuthServiceTest
+[INFO] Running com.agricultura.service.CulturaServiceTest
+[ERROR] Tests run: 6, Failures: 1, Errors: 1, Skipped: 0, Time elapsed: 0.101 s <<< FAILURE! -- in com.agricultura.service.CulturaServiceTest
+[ERROR] com.agricultura.service.CulturaServiceTest.create_UserNotFound_ThrowsException -- Time elapsed: 0.008 s <<< FAILURE!
+org.opentest4j.AssertionFailedError: Unexpected exception type thrown, expected: <com.agricultura.exception.ResourceNotFoundException> but was: <java.lang.NullPointerException>
+	at org.junit.jupiter.api.AssertionFailureBuilder.build(AssertionFailureBuilder.java:151)
+	at org.junit.jupiter.api.AssertThrows.assertThrows(AssertThrows.java:67)
+	at org.junit.jupiter.api.AssertThrows.assertThrows(AssertThrows.java:35)
+	at org.junit.jupiter.api.Assertions.assertThrows(Assertions.java:3115)
+	at com.agricultura.service.CulturaServiceTest.create_UserNotFound_ThrowsException(CulturaServiceTest.java:128)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+Caused by: java.lang.NullPointerException: Cannot invoke "com.agricultura.domain.Cultura.getId()" because "cultura" is null
+	at com.agricultura.service.CulturaService.toResponse(CulturaService.java:106)
+	at com.agricultura.service.CulturaService.create(CulturaService.java:65)
+	at com.agricultura.service.CulturaServiceTest.lambda$create_UserNotFound_ThrowsException$3(CulturaServiceTest.java:128)
+	at org.junit.jupiter.api.AssertThrows.assertThrows(AssertThrows.java:53)
+	... 6 more
+
+[ERROR] com.agricultura.service.CulturaServiceTest.create_Success -- Time elapsed: 0.003 s <<< ERROR!
+java.lang.NullPointerException: Cannot invoke "com.agricultura.domain.Usuario.getId()" because the return value of "com.agricultura.domain.Cultura.getUser()" is null
+	at com.agricultura.service.CulturaService.toResponse(CulturaService.java:114)
+	at com.agricultura.service.CulturaService.create(CulturaService.java:65)
+	at com.agricultura.service.CulturaServiceTest.create_Success(CulturaServiceTest.java:112)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:580)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1596)
+
+[INFO] Running com.agricultura.service.TarefaServiceTest
+[INFO] Tests run: 8, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.137 s -- in com.agricultura.service.TarefaServiceTest
+[INFO] 
+[INFO] Results:
+[INFO] 
+[ERROR] Failures: 
+[ERROR]   CulturaServiceTest.create_UserNotFound_ThrowsException:128 Unexpected exception type thrown, expected: <com.agricultura.exception.ResourceNotFoundException> but was: <java.lang.NullPointerException>
+[ERROR] Errors: 
+[ERROR]   CulturaServiceTest.create_Success:112 » NullPointer Cannot invoke "com.agricultura.domain.Usuario.getId()" because the return value of "com.agricultura.domain.Cultura.getUser()" is null
+[INFO] 
+[ERROR] Tests run: 28, Failures: 1, Errors: 1, Skipped: 0
+[INFO] 
+[INFO] ------------------------------------------------------------------------
+[INFO] BUILD FAILURE
+[INFO] ------------------------------------------------------------------------
+[INFO] Total time:  8.241 s
+[INFO] Finished at: 2026-04-09T21:15:34-03:00
+[INFO] ------------------------------------------------------------------------
+[ERROR] Failed to execute goal org.apache.maven.plugins:maven-surefire-plugin:3.1.2:test (default-test) on project projeto-spring-backend: There are test failures.
+[ERROR] 
+[ERROR] Please refer to C:\Users\Usuario\Documents\java\spring\Projeto-spring\backend\target\surefire-reports for the individual test results.
+[ERROR] Please refer to dump files (if any exist) [date].dump, [date]-jvmRun[N].dump and [date].dumpstream.
+[ERROR] -> [Help 1]
+[ERROR] 
+[ERROR] To see the full stack trace of the errors, re-run Maven with the -e switch.
+[ERROR] Re-run Maven using the -X switch to enable full debug logging.
+[ERROR] 
+[ERROR] For more information about the errors and possible solutions, please read the following articles:
+[ERROR] [Help 1] http://cwiki.apache.org/confluence/display/MAVEN/MojoFailureException
