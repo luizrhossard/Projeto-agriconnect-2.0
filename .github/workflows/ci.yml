@@ -26,9 +26,6 @@ jobs:
         distribution: 'temurin'
         cache: 'maven'
         
-    - name: Debug - List Files
-      run: ls -la
-        
     - name: Give execution permission for Maven Wrapper
       run: chmod +x mvnw
         
