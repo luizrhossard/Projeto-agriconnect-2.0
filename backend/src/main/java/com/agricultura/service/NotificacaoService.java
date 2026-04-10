@@ -1,8 +1,10 @@
 package com.agricultura.service;
 
 import com.agricultura.domain.Notificacao;
+import com.agricultura.domain.Usuario;
 import com.agricultura.dto.NotificacaoResponse;
 import com.agricultura.repository.NotificacaoRepository;
+import com.agricultura.repository.UsuarioRepository;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -14,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class NotificacaoService {
 
     private final NotificacaoRepository notificacaoRepository;
+    private final UsuarioRepository usuarioRepository;
 
     public List<NotificacaoResponse> buscarPorUsuario(Long usuarioId) {
         return notificacaoRepository.findByUsuarioIdOrderByDataCriacaoDesc(usuarioId).stream()
@@ -33,8 +36,11 @@ public class NotificacaoService {
 
     @Transactional
     public void criarNotificacao(Long usuarioId, String titulo, String mensagem, String tipo) {
+        Usuario usuario = usuarioRepository.findById(usuarioId)
+                .orElseThrow(() -> new com.agricultura.exception.ResourceNotFoundException("Usuário não encontrado"));
+
         Notificacao notificacao = Notificacao.builder()
-                .usuarioId(usuarioId)
+                .usuario(usuario)
                 .titulo(titulo)
                 .mensagem(mensagem)
                 .tipo(tipo != null ? tipo : "INFO")

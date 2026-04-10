@@ -27,8 +27,9 @@ public class Notificacao {
     @Builder.Default
     private String tipo = "INFO";
 
-    @Column(name = "usuario_id", nullable = false)
-    private Long usuarioId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private Usuario usuario;
 
     @Column(name = "lida", nullable = false)
     @Builder.Default

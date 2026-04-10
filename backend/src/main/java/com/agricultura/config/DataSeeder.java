@@ -71,8 +71,10 @@ public class DataSeeder implements CommandLineRunner {
     private void criarNotificacoesExemplo(Long usuarioId) {
         log.info("Criando notificações de exemplo...");
 
+        Usuario usuario = usuarioRepository.findById(usuarioId).orElseThrow();
+
         notificacaoRepository.save(Notificacao.builder()
-                .usuarioId(usuarioId)
+                .usuario(usuario)
                 .titulo("Irrigação necessária")
                 .mensagem("Setor 3 - Milho requer irrigação urgente")
                 .tipo("ALERTA")
@@ -81,7 +83,7 @@ public class DataSeeder implements CommandLineRunner {
                 .build());
 
         notificacaoRepository.save(Notificacao.builder()
-                .usuarioId(usuarioId)
+                .usuario(usuario)
                 .titulo("Praga detectada")
                 .mensagem("Lavoura de soja - Área norte requer atenção")
                 .tipo("ALERTA")
@@ -90,7 +92,7 @@ public class DataSeeder implements CommandLineRunner {
                 .build());
 
         notificacaoRepository.save(Notificacao.builder()
-                .usuarioId(usuarioId)
+                .usuario(usuario)
                 .titulo("Preço atualizado")
                 .mensagem("Soja subiu 2.5% nas últimas 24h")
                 .tipo("SUCESSO")
@@ -99,7 +101,7 @@ public class DataSeeder implements CommandLineRunner {
                 .build());
 
         notificacaoRepository.save(Notificacao.builder()
-                .usuarioId(usuarioId)
+                .usuario(usuario)
                 .titulo("Tarefa próxima do vencimento")
                 .mensagem("Aplicação de defensivo vence em 2 dias")
                 .tipo("AVISO")
