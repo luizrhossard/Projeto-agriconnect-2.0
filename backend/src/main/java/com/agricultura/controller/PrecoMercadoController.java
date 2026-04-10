@@ -3,6 +3,7 @@ package com.agricultura.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import com.agricultura.dto.*;
@@ -35,7 +36,7 @@ public class PrecoMercadoController {
     @PostMapping
     public ResponseEntity<PrecoMercadoResponse> create(@Valid @RequestBody PrecoMercadoRequest request) {
         Long userId = authService.getCurrentUser().getId();
-        return ResponseEntity.ok(precoMercadoService.create(request, userId));
+        return ResponseEntity.status(HttpStatus.CREATED).body(precoMercadoService.create(request, userId));
     }
 
     @PutMapping("/{id}")

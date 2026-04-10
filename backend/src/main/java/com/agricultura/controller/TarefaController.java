@@ -3,6 +3,7 @@ package com.agricultura.controller;
 import java.util.List;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import com.agricultura.dto.*;
@@ -35,7 +36,7 @@ public class TarefaController {
     @PostMapping
     public ResponseEntity<TarefaResponse> create(@Valid @RequestBody TarefaRequest request) {
         Long userId = authService.getCurrentUser().getId();
-        return ResponseEntity.ok(tarefaService.create(request, userId));
+        return ResponseEntity.status(HttpStatus.CREATED).body(tarefaService.create(request, userId));
     }
 
     @PutMapping("/{id}")

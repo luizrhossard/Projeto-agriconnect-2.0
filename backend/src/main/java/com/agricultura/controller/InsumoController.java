@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import com.agricultura.dto.*;
@@ -38,7 +39,7 @@ public class InsumoController {
     @PostMapping
     public ResponseEntity<InsumoResponse> create(@Valid @RequestBody InsumoRequest request) {
         Long userId = authService.getCurrentUser().getId();
-        return ResponseEntity.ok(insumoService.create(request, userId));
+        return ResponseEntity.status(HttpStatus.CREATED).body(insumoService.create(request, userId));
     }
 
     @PutMapping("/{id}")
@@ -64,7 +65,7 @@ public class InsumoController {
     public ResponseEntity<MovimentoEstoqueResponse> registrarMovimento(
             @Valid @RequestBody MovimentoEstoqueRequest request) {
         Long userId = authService.getCurrentUser().getId();
-        return ResponseEntity.ok(insumoService.registrarMovimento(request, userId));
+        return ResponseEntity.status(HttpStatus.CREATED).body(insumoService.registrarMovimento(request, userId));
     }
 
     @GetMapping("/{id}/movimentos")
