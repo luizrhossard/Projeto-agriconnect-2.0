@@ -2,6 +2,7 @@ package com.agricultura.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
@@ -16,6 +17,10 @@ public class RegisterRequest {
     private String email;
 
     @NotBlank(message = "Senha é obrigatória")
-    @Size(min = 6, max = 100, message = "Senha deve ter entre 6 e 100 caracteres")
+    @Size(min = 8, max = 100, message = "Senha deve ter entre 8 e 100 caracteres")
+    @Pattern(
+        regexp = "^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&].*$",
+        message = "Senha deve conter pelo menos uma letra maiúscula, uma minúscula, um número e um caractere especial"
+    )
     private String password;
 }

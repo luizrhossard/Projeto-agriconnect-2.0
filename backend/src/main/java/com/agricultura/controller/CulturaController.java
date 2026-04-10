@@ -20,31 +20,31 @@ public class CulturaController {
 
     @GetMapping
     public ResponseEntity<List<CulturaResponse>> findAll() {
-        Long userId = authService.getCurrentUser().getId();
+        Long userId = authService.getCurrentUserId();
         return ResponseEntity.ok(culturaService.findAll(userId));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<CulturaResponse> findById(@PathVariable Long id) {
-        Long userId = authService.getCurrentUser().getId();
+        Long userId = authService.getCurrentUserId();
         return ResponseEntity.ok(culturaService.findById(id, userId));
     }
 
     @PostMapping
     public ResponseEntity<CulturaResponse> create(@Valid @RequestBody CulturaRequest request) {
-        Long userId = authService.getCurrentUser().getId();
+        Long userId = authService.getCurrentUserId();
         return ResponseEntity.status(HttpStatus.CREATED).body(culturaService.create(request, userId));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<CulturaResponse> update(@PathVariable Long id, @Valid @RequestBody CulturaRequest request) {
-        Long userId = authService.getCurrentUser().getId();
+        Long userId = authService.getCurrentUserId();
         return ResponseEntity.ok(culturaService.update(id, request, userId));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        Long userId = authService.getCurrentUser().getId();
+        Long userId = authService.getCurrentUserId();
         culturaService.delete(id, userId);
         return ResponseEntity.noContent().build();
     }

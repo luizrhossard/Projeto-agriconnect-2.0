@@ -20,32 +20,32 @@ public class PrecoMercadoController {
 
     @GetMapping
     public ResponseEntity<List<PrecoMercadoResponse>> findAll() {
-        Long userId = authService.getCurrentUser().getId();
+        Long userId = authService.getCurrentUserId();
         return ResponseEntity.ok(precoMercadoService.findAll(userId));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<PrecoMercadoResponse> findById(@PathVariable Long id) {
-        Long userId = authService.getCurrentUser().getId();
+        Long userId = authService.getCurrentUserId();
         return ResponseEntity.ok(precoMercadoService.findById(id, userId));
     }
 
     @PostMapping
     public ResponseEntity<PrecoMercadoResponse> create(@Valid @RequestBody PrecoMercadoRequest request) {
-        Long userId = authService.getCurrentUser().getId();
+        Long userId = authService.getCurrentUserId();
         return ResponseEntity.status(HttpStatus.CREATED).body(precoMercadoService.create(request, userId));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<PrecoMercadoResponse> update(
             @PathVariable Long id, @Valid @RequestBody PrecoMercadoRequest request) {
-        Long userId = authService.getCurrentUser().getId();
+        Long userId = authService.getCurrentUserId();
         return ResponseEntity.ok(precoMercadoService.update(id, request, userId));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        Long userId = authService.getCurrentUser().getId();
+        Long userId = authService.getCurrentUserId();
         precoMercadoService.delete(id, userId);
         return ResponseEntity.noContent().build();
     }

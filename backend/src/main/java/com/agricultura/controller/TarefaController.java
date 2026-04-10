@@ -20,31 +20,31 @@ public class TarefaController {
 
     @GetMapping
     public ResponseEntity<List<TarefaResponse>> findAll() {
-        Long userId = authService.getCurrentUser().getId();
+        Long userId = authService.getCurrentUserId();
         return ResponseEntity.ok(tarefaService.findAll(userId));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<TarefaResponse> findById(@PathVariable Long id) {
-        Long userId = authService.getCurrentUser().getId();
+        Long userId = authService.getCurrentUserId();
         return ResponseEntity.ok(tarefaService.findById(id, userId));
     }
 
     @PostMapping
     public ResponseEntity<TarefaResponse> create(@Valid @RequestBody TarefaRequest request) {
-        Long userId = authService.getCurrentUser().getId();
+        Long userId = authService.getCurrentUserId();
         return ResponseEntity.status(HttpStatus.CREATED).body(tarefaService.create(request, userId));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<TarefaResponse> update(@PathVariable Long id, @Valid @RequestBody TarefaRequest request) {
-        Long userId = authService.getCurrentUser().getId();
+        Long userId = authService.getCurrentUserId();
         return ResponseEntity.ok(tarefaService.update(id, request, userId));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        Long userId = authService.getCurrentUser().getId();
+        Long userId = authService.getCurrentUserId();
         tarefaService.delete(id, userId);
         return ResponseEntity.noContent().build();
     }

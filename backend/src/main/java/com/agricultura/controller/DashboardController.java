@@ -17,7 +17,7 @@ public class DashboardController {
 
     @GetMapping("/resumo")
     public ResponseEntity<DashboardResponse> getResumo() {
-        Long userId = authService.getCurrentUser().getId();
+        Long userId = authService.getCurrentUserId();
         return ResponseEntity.ok(dashboardService.getResumo(userId));
     }
 }

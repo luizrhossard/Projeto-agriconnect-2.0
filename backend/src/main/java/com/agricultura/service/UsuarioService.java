@@ -6,8 +6,6 @@ import com.agricultura.repository.UsuarioRepository;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -15,15 +13,11 @@ import org.springframework.stereotype.Service;
 public class UsuarioService {
 
     private final UsuarioRepository usuarioRepository;
-
-    public Usuario getCurrentUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
-        return usuarioRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
-    }
+    private final AuthService authService;
 
     public UsuarioResponse getCurrentUserResponse() {
-        return toResponse(getCurrentUser());
+        Usuario usuario = authService.getCurrentUser();
+        return toResponse(usuario);
     }
 
     public List<UsuarioResponse> findAll() {

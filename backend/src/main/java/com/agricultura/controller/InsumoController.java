@@ -23,45 +23,45 @@ public class InsumoController {
 
     @GetMapping
     public ResponseEntity<List<InsumoResponse>> findAll() {
-        Long userId = authService.getCurrentUser().getId();
+        Long userId = authService.getCurrentUserId();
         return ResponseEntity.ok(insumoService.findAll(userId));
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<InsumoResponse> findById(@PathVariable Long id) {
-        Long userId = authService.getCurrentUser().getId();
+        Long userId = authService.getCurrentUserId();
         return ResponseEntity.ok(insumoService.findById(id, userId));
     }
 
     @PostMapping
     public ResponseEntity<InsumoResponse> create(@Valid @RequestBody InsumoRequest request) {
-        Long userId = authService.getCurrentUser().getId();
+        Long userId = authService.getCurrentUserId();
         return ResponseEntity.status(HttpStatus.CREATED).body(insumoService.create(request, userId));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<InsumoResponse> update(@PathVariable Long id, @Valid @RequestBody InsumoRequest request) {
-        Long userId = authService.getCurrentUser().getId();
+        Long userId = authService.getCurrentUserId();
         return ResponseEntity.ok(insumoService.update(id, request, userId));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
-        Long userId = authService.getCurrentUser().getId();
+        Long userId = authService.getCurrentUserId();
         insumoService.delete(id, userId);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/estoque-baixo")
     public ResponseEntity<List<InsumoResponse>> findEstoqueBaixo() {
-        Long userId = authService.getCurrentUser().getId();
+        Long userId = authService.getCurrentUserId();
         return ResponseEntity.ok(insumoService.findEstoqueBaixo(userId));
     }
 
     @PostMapping("/movimento")
     public ResponseEntity<MovimentoEstoqueResponse> registrarMovimento(
             @Valid @RequestBody MovimentoEstoqueRequest request) {
-        Long userId = authService.getCurrentUser().getId();
+        Long userId = authService.getCurrentUserId();
         return ResponseEntity.status(HttpStatus.CREATED).body(insumoService.registrarMovimento(request, userId));
     }
 
@@ -74,7 +74,7 @@ public class InsumoController {
     @GetMapping("/movimentos")
     public ResponseEntity<Page<MovimentoEstoqueResponse>> findTodosMovimentos(
             @PageableDefault(size = 10) Pageable pageable) {
-        Long userId = authService.getCurrentUser().getId();
+        Long userId = authService.getCurrentUserId();
         return ResponseEntity.ok(insumoService.findMovimentosByUser(userId, pageable));
     }
 }

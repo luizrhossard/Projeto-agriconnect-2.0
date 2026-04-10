@@ -5,7 +5,9 @@ import com.agricultura.dto.*;
 import com.agricultura.exception.BusinessException;
 import com.agricultura.exception.ResourceNotFoundException;
 import com.agricultura.repository.UsuarioRepository;
+import com.agricultura.security.CustomUserDetails;
 import com.agricultura.security.JwtService;
+import com.agricultura.util.HtmlSanitizer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,6 +25,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final LoginAttemptService loginAttemptService;
 
     @Transactional
     public AuthResponse register(RegisterRequest request) {
@@ -30,9 +33,11 @@ public class AuthService {
             throw new BusinessException("Email já está em uso");
         }
 
+        String sanitizedName = HtmlSanitizer.sanitize(request.getName());
+
         Usuario usuario = Usuario.builder()
-                .name(request.getName())
-                .email(request.getEmail())
+                .name(sanitizedName)
+                .email(request.getEmail().toLowerCase().trim())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role("USER")
                 .build();
@@ -52,30 +57,52 @@ public class AuthService {
     }
 
     public AuthResponse login(LoginRequest request) {
-        authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword()));
+        String email = request.getEmail().toLowerCase().trim();
 
-        Usuario usuario = usuarioRepository
-                .findByEmail(request.getEmail())
-                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
+        if (loginAttemptService.isBlocked(email)) {
+            long remainingMinutes = loginAttemptService.getRemainingLockMinutes(email);
+            throw new BusinessException(
+                "Conta temporariamente bloqueada. Tente novamente em " + remainingMinutes + " minutos.");
+        }
 
-        String token = jwtService.generateToken(usuario);
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(email, request.getPassword()));
 
-        return AuthResponse.builder()
-                .token(token)
-                .type("Bearer")
-                .id(usuario.getId())
-                .name(usuario.getName())
-                .email(usuario.getEmail())
-                .role(usuario.getRole())
-                .build();
+            loginAttemptService.loginSucceeded(email);
+
+            Usuario usuario = usuarioRepository
+                    .findByEmail(email)
+                    .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
+
+            String token = jwtService.generateToken(usuario);
+
+            return AuthResponse.builder()
+                    .token(token)
+                    .type("Bearer")
+                    .id(usuario.getId())
+                    .name(usuario.getName())
+                    .email(usuario.getEmail())
+                    .role(usuario.getRole())
+                    .build();
+        } catch (org.springframework.security.core.AuthenticationException e) {
+            loginAttemptService.loginFailed(email);
+            throw e;
+        }
+    }
+
+    public Long getCurrentUserId() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails userDetails) {
+            return userDetails.getUserId();
+        }
+        throw new ResourceNotFoundException("Usuário não autenticado");
     }
 
     public Usuario getCurrentUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String email = authentication.getName();
+        Long userId = getCurrentUserId();
         return usuarioRepository
-                .findByEmail(email)
+                .findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
     }
 }
