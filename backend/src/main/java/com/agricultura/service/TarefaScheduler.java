@@ -7,8 +7,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import com.agricultura.domain.Tarefa;
-import com.agricultura.domain.Usuario;
-import com.agricultura.repository.UsuarioRepository;
+import com.agricultura.repository.TarefaRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,9 +17,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class TarefaScheduler {
 
-    private final TarefaService tarefaService;
+    private final TarefaRepository tarefaRepository;
     private final NotificacaoService notificacaoService;
-    private final UsuarioRepository usuarioRepository;
 
     @Scheduled(cron = "0 0 8 * * *")
     public void verificarTarefasVencidas() {
@@ -28,17 +26,14 @@ public class TarefaScheduler {
 
         LocalDate hoje = LocalDate.now();
         LocalDate amanha = hoje.plusDays(1);
+        List<String> statusAtivos = List.of("PENDENTE", "EM_ANDAMENTO");
 
-        List<Tarefa> tarefas = tarefaService.findAllTarefas();
-        List<Usuario> usuarios = usuarioRepository.findAll();
+        List<Tarefa> tarefasRelevantes = tarefaRepository
+                .findByDataVencimentoInAndStatusIn(List.of(hoje.minusDays(1), hoje, amanha), statusAtivos);
 
-        for (Tarefa tarefa : tarefas) {
-            if (!"PENDENTE".equals(tarefa.getStatus()) && !"EM_ANDAMENTO".equals(tarefa.getStatus())) {
-                continue;
-            }
-
-            LocalDate dataVencimento = tarefa.getDataVencimento();
+        for (Tarefa tarefa : tarefasRelevantes) {
             Long usuarioId = tarefa.getUser().getId();
+            LocalDate dataVencimento = tarefa.getDataVencimento();
 
             if (dataVencimento.isBefore(hoje)) {
                 notificacaoService.criarNotificacao(

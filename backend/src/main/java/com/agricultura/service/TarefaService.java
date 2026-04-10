@@ -11,6 +11,7 @@ import com.agricultura.domain.Tarefa;
 import com.agricultura.domain.Usuario;
 import com.agricultura.dto.TarefaRequest;
 import com.agricultura.dto.TarefaResponse;
+import com.agricultura.exception.ResourceNotFoundException;
 import com.agricultura.repository.CulturaRepository;
 import com.agricultura.repository.TarefaRepository;
 import com.agricultura.repository.UsuarioRepository;
@@ -35,10 +36,10 @@ public class TarefaService {
 
     @Transactional(readOnly = true)
     public TarefaResponse findById(Long id, Long userId) {
-        Tarefa tarefa = tarefaRepository.findById(id).orElseThrow(() -> new RuntimeException("Tarefa não encontrada"));
+        Tarefa tarefa = tarefaRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Tarefa não encontrada"));
 
         if (!tarefa.getUser().getId().equals(userId)) {
-            throw new RuntimeException("Acesso negado a esta tarefa");
+            throw new org.springframework.security.access.AccessDeniedException("Acesso negado a esta tarefa");
         }
 
         return toResponse(tarefa);
@@ -46,8 +47,7 @@ public class TarefaService {
 
     @Transactional
     public TarefaResponse create(TarefaRequest request, Long userId) {
-        Usuario usuario =
-                usuarioRepository.findById(userId).orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+        Usuario usuario = usuarioRepository.getReferenceById(userId);
 
         Tarefa tarefa = Tarefa.builder()
                 .titulo(request.getTitulo())
@@ -61,7 +61,7 @@ public class TarefaService {
         if (request.getCulturaId() != null) {
             Cultura cultura = culturaRepository
                     .findById(request.getCulturaId())
-                    .orElseThrow(() -> new RuntimeException("Cultura não encontrada"));
+                    .orElseThrow(() -> new ResourceNotFoundException("Cultura não encontrada"));
             tarefa.setCultura(cultura);
         }
 
@@ -74,10 +74,10 @@ public class TarefaService {
 
     @Transactional
     public TarefaResponse update(Long id, TarefaRequest request, Long userId) {
-        Tarefa tarefa = tarefaRepository.findById(id).orElseThrow(() -> new RuntimeException("Tarefa não encontrada"));
+        Tarefa tarefa = tarefaRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Tarefa não encontrada"));
 
         if (!tarefa.getUser().getId().equals(userId)) {
-            throw new RuntimeException("Acesso negado a esta tarefa");
+            throw new org.springframework.security.access.AccessDeniedException("Acesso negado a esta tarefa");
         }
 
         tarefa.setTitulo(request.getTitulo());
@@ -94,7 +94,7 @@ public class TarefaService {
         if (request.getCulturaId() != null) {
             Cultura cultura = culturaRepository
                     .findById(request.getCulturaId())
-                    .orElseThrow(() -> new RuntimeException("Cultura não encontrada"));
+                    .orElseThrow(() -> new ResourceNotFoundException("Cultura não encontrada"));
             tarefa.setCultura(cultura);
         } else {
             tarefa.setCultura(null);
@@ -118,10 +118,10 @@ public class TarefaService {
 
     @Transactional
     public void delete(Long id, Long userId) {
-        Tarefa tarefa = tarefaRepository.findById(id).orElseThrow(() -> new RuntimeException("Tarefa não encontrada"));
+        Tarefa tarefa = tarefaRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Tarefa não encontrada"));
 
         if (!tarefa.getUser().getId().equals(userId)) {
-            throw new RuntimeException("Acesso negado a esta tarefa");
+            throw new org.springframework.security.access.AccessDeniedException("Acesso negado a esta tarefa");
         }
 
         tarefaRepository.delete(tarefa);

@@ -12,8 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.agricultura.dto.*;
-import com.agricultura.repository.CulturaRepository;
-import com.agricultura.repository.TarefaRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -21,8 +19,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class DashboardService {
 
-    private final CulturaRepository culturaRepository;
-    private final TarefaRepository tarefaRepository;
     private final CulturaService culturaService;
     private final TarefaService tarefaService;
 
@@ -230,26 +226,6 @@ public class DashboardService {
                 .collect(Collectors.toList());
     }
 
-    private String getIconePorStatus(String status) {
-        if (status == null) return "🌱";
-        return switch (status.toLowerCase()) {
-            case "plantio", "crescendo" -> "🌱";
-            case "tratos_culturais" -> "🧪";
-            case "colheita" -> "🌾";
-            case "finalizada" -> "✅";
-            default -> "🌱";
-        };
-    }
-
-    private String getIconePorPrioridade(String prioridade) {
-        if (prioridade == null) return "📋";
-        return switch (prioridade.toLowerCase()) {
-            case "alta" -> "🔴";
-            case "media", "média" -> "🟡";
-            case "baixa" -> "🟢";
-            default -> "📋";
-        };
-    }
 
     private String getTipoAtividade(String status) {
         if (status == null) return "Cultura iniciada";

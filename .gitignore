@@ -4,6 +4,7 @@ backend/target/
 backend/nul
 *.class
 *.log
+test_output.txt
 
 # Environment variables (exceto exemplos/template)
 .env

@@ -11,6 +11,7 @@ import com.agricultura.domain.PrecoMercado;
 import com.agricultura.domain.Usuario;
 import com.agricultura.dto.PrecoMercadoRequest;
 import com.agricultura.dto.PrecoMercadoResponse;
+import com.agricultura.exception.ResourceNotFoundException;
 import com.agricultura.repository.PrecoMercadoRepository;
 import com.agricultura.repository.UsuarioRepository;
 
@@ -37,10 +38,10 @@ public class PrecoMercadoService {
     public PrecoMercadoResponse findById(Long id, Long userId) {
         PrecoMercado preco = precoMercadoRepository
                 .findById(id)
-                .orElseThrow(() -> new RuntimeException("Preço de mercado não encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Preço de mercado não encontrado"));
 
         if (!preco.getUser().getId().equals(userId)) {
-            throw new RuntimeException("Acesso negado a este preço");
+            throw new org.springframework.security.access.AccessDeniedException("Acesso negado a este preço");
         }
 
         return toResponse(preco);
@@ -48,8 +49,7 @@ public class PrecoMercadoService {
 
     @Transactional
     public PrecoMercadoResponse create(PrecoMercadoRequest request, Long userId) {
-        Usuario usuario =
-                usuarioRepository.findById(userId).orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+        Usuario usuario = usuarioRepository.getReferenceById(userId);
 
         PrecoMercado preco = PrecoMercado.builder()
                 .produto(request.getProduto())
@@ -68,10 +68,10 @@ public class PrecoMercadoService {
     public PrecoMercadoResponse update(Long id, PrecoMercadoRequest request, Long userId) {
         PrecoMercado preco = precoMercadoRepository
                 .findById(id)
-                .orElseThrow(() -> new RuntimeException("Preço de mercado não encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Preço de mercado não encontrado"));
 
         if (!preco.getUser().getId().equals(userId)) {
-            throw new RuntimeException("Acesso negado a este preço");
+            throw new org.springframework.security.access.AccessDeniedException("Acesso negado a este preço");
         }
 
         BigDecimal precoAnterior = preco.getPreco();
@@ -97,7 +97,7 @@ public class PrecoMercadoService {
                         userId,
                         preco.getProduto() + " subiu!",
                         String.format("%.1f%% de aumento", variacaoPercentual),
-                        "SUCESSO");
+                        "ALERTA");
             } else if (variacaoPercentual.compareTo(BigDecimal.valueOf(-LIMITE_VARIACAO)) < 0) {
                 notificacaoService.criarNotificacao(
                         userId,
@@ -114,10 +114,10 @@ public class PrecoMercadoService {
     public void delete(Long id, Long userId) {
         PrecoMercado preco = precoMercadoRepository
                 .findById(id)
-                .orElseThrow(() -> new RuntimeException("Preço de mercado não encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Preço de mercado não encontrado"));
 
         if (!preco.getUser().getId().equals(userId)) {
-            throw new RuntimeException("Acesso negado a este preço");
+            throw new org.springframework.security.access.AccessDeniedException("Acesso negado a este preço");
         }
 
         precoMercadoRepository.delete(preco);

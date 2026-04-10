@@ -10,6 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.agricultura.domain.Usuario;
 import com.agricultura.dto.*;
+import com.agricultura.exception.BusinessException;
+import com.agricultura.exception.ResourceNotFoundException;
 import com.agricultura.repository.UsuarioRepository;
 import com.agricultura.security.JwtService;
 
@@ -27,7 +29,7 @@ public class AuthService {
     @Transactional
     public AuthResponse register(RegisterRequest request) {
         if (usuarioRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email já está em uso");
+            throw new BusinessException("Email já está em uso");
         }
 
         Usuario usuario = Usuario.builder()
@@ -57,7 +59,7 @@ public class AuthService {
 
         Usuario usuario = usuarioRepository
                 .findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
 
         String token = jwtService.generateToken(usuario);
 
@@ -74,6 +76,6 @@ public class AuthService {
     public Usuario getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String email = authentication.getName();
-        return usuarioRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+        return usuarioRepository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
     }
 }

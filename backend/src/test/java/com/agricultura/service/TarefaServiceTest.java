@@ -20,6 +20,7 @@ import com.agricultura.domain.Tarefa;
 import com.agricultura.domain.Usuario;
 import com.agricultura.dto.TarefaRequest;
 import com.agricultura.dto.TarefaResponse;
+import com.agricultura.exception.ResourceNotFoundException;
 import com.agricultura.repository.CulturaRepository;
 import com.agricultura.repository.TarefaRepository;
 import com.agricultura.repository.UsuarioRepository;
@@ -93,14 +94,14 @@ class TarefaServiceTest {
     void findById_NotFound_ThrowsException() {
         when(tarefaRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThrows(RuntimeException.class, () -> tarefaService.findById(1L, 1L));
+        assertThrows(ResourceNotFoundException.class, () -> tarefaService.findById(1L, 1L));
     }
 
     @Test
     void findById_AccessDenied_ThrowsException() {
         when(tarefaRepository.findById(1L)).thenReturn(Optional.of(tarefa));
 
-        assertThrows(RuntimeException.class, () -> tarefaService.findById(1L, 999L));
+        assertThrows(org.springframework.security.access.AccessDeniedException.class, () -> tarefaService.findById(1L, 999L));
     }
 
     @Test
@@ -112,10 +113,11 @@ class TarefaServiceTest {
         request.setStatus("PENDENTE");
         request.setDataVencimento(LocalDate.now().plusDays(5));
 
-        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
+        when(usuarioRepository.getReferenceById(1L)).thenReturn(usuario);
         when(tarefaRepository.save(any(Tarefa.class))).thenAnswer(invocation -> {
             Tarefa t = invocation.getArgument(0);
             t.setId(2L);
+            t.setUser(usuario);
             return t;
         });
         doNothing().when(notificacaoService).criarNotificacao(anyLong(), anyString(), anyString(), anyString());
@@ -134,11 +136,12 @@ class TarefaServiceTest {
         request.setDataVencimento(LocalDate.now().plusDays(5));
         request.setCulturaId(1L);
 
-        when(usuarioRepository.findById(1L)).thenReturn(Optional.of(usuario));
+        when(usuarioRepository.getReferenceById(1L)).thenReturn(usuario);
         when(culturaRepository.findById(1L)).thenReturn(Optional.of(cultura));
         when(tarefaRepository.save(any(Tarefa.class))).thenAnswer(invocation -> {
             Tarefa t = invocation.getArgument(0);
             t.setId(2L);
+            t.setUser(usuario);
             return t;
         });
         doNothing().when(notificacaoService).criarNotificacao(anyLong(), anyString(), anyString(), anyString());
@@ -162,6 +165,6 @@ class TarefaServiceTest {
     void delete_NotFound_ThrowsException() {
         when(tarefaRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThrows(RuntimeException.class, () -> tarefaService.delete(1L, 1L));
+        assertThrows(ResourceNotFoundException.class, () -> tarefaService.delete(1L, 1L));
     }
 }

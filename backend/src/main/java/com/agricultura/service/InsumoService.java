@@ -17,6 +17,7 @@ import com.agricultura.dto.InsumoResponse;
 import com.agricultura.dto.MovimentoEstoqueRequest;
 import com.agricultura.dto.MovimentoEstoqueResponse;
 import com.agricultura.exception.ResourceNotFoundException;
+import com.agricultura.exception.BusinessException;
 import com.agricultura.repository.InsumoRepository;
 import com.agricultura.repository.MovimentoEstoqueRepository;
 import com.agricultura.repository.UsuarioRepository;
@@ -42,7 +43,7 @@ public class InsumoService {
                 insumoRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Insumo não encontrado"));
 
         if (!insumo.getUser().getId().equals(userId)) {
-            throw new RuntimeException("Acesso negado");
+            throw new org.springframework.security.access.AccessDeniedException("Acesso negado a este insumo");
         }
 
         return toResponse(insumo);
@@ -50,9 +51,7 @@ public class InsumoService {
 
     @Transactional
     public InsumoResponse create(InsumoRequest request, Long userId) {
-        Usuario usuario = usuarioRepository
-                .findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
+        Usuario usuario = usuarioRepository.getReferenceById(userId);
 
         Insumo insumo = Insumo.builder()
                 .nome(request.getNome())
@@ -83,7 +82,7 @@ public class InsumoService {
                 insumoRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Insumo não encontrado"));
 
         if (!insumo.getUser().getId().equals(userId)) {
-            throw new RuntimeException("Acesso negado");
+            throw new org.springframework.security.access.AccessDeniedException("Acesso negado a este insumo");
         }
 
         insumo.setNome(request.getNome());
@@ -104,7 +103,7 @@ public class InsumoService {
                 insumoRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Insumo não encontrado"));
 
         if (!insumo.getUser().getId().equals(userId)) {
-            throw new RuntimeException("Acesso negado");
+            throw new org.springframework.security.access.AccessDeniedException("Acesso negado a este insumo");
         }
 
         insumo.setAtivo(false);
@@ -118,12 +117,10 @@ public class InsumoService {
                 .orElseThrow(() -> new ResourceNotFoundException("Insumo não encontrado"));
 
         if (!insumo.getUser().getId().equals(userId)) {
-            throw new RuntimeException("Acesso negado");
+            throw new org.springframework.security.access.AccessDeniedException("Acesso negado a este insumo");
         }
 
-        Usuario usuario = usuarioRepository
-                .findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("Usuário não encontrado"));
+        Usuario usuario = usuarioRepository.getReferenceById(userId);
 
         return registrarMovimento(
                 insumo,
@@ -142,7 +139,7 @@ public class InsumoService {
             insumo.setQuantidade(insumo.getQuantidade().add(quantidade));
         } else if ("SAIDA".equals(tipo)) {
             if (insumo.getQuantidade().compareTo(quantidade) < 0) {
-                throw new RuntimeException("Quantidade em estoque insuficiente");
+                throw new BusinessException("Estoque insuficiente: disponível " + insumo.getQuantidade() + ", solicitado " + quantidade);
             }
             insumo.setQuantidade(insumo.getQuantidade().subtract(quantidade));
         }
@@ -174,7 +171,8 @@ public class InsumoService {
     }
 
     public List<InsumoResponse> findEstoqueBaixo(Long userId) {
-        return insumoRepository.findByUserIdAndQuantidadeLessThanEqual(userId, BigDecimal.valueOf(10)).stream()
+        return insumoRepository.findByUserIdAndAtivoTrue(userId).stream()
+                .filter(insumo -> insumo.getQuantidade().compareTo(insumo.getEstoqueMinimo()) <= 0)
                 .map(this::toResponse)
                 .collect(Collectors.toList());
     }

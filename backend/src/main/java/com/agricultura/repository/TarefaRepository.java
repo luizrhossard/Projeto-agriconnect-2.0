@@ -1,5 +1,6 @@
 package com.agricultura.repository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.EntityGraph;
@@ -16,4 +17,7 @@ public interface TarefaRepository extends JpaRepository<Tarefa, Long> {
 
     @EntityGraph(attributePaths = {"user", "cultura"})
     List<Tarefa> findByCulturaId(Long culturaId);
+
+    @EntityGraph(attributePaths = {"user"})
+    List<Tarefa> findByDataVencimentoInAndStatusIn(List<LocalDate> datas, List<String> statuses);
 }
