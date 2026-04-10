@@ -1,10 +1,10 @@
 package com.agricultura.dto;
 
-import com.agricultura.domain.StatusCultura;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+
+import com.agricultura.domain.StatusCultura;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

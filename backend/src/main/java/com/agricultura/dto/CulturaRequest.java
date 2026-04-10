@@ -1,8 +1,8 @@
 package com.agricultura.dto;
 
-import com.agricultura.domain.StatusCultura;
-
 import java.time.LocalDate;
+
+import com.agricultura.domain.StatusCultura;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

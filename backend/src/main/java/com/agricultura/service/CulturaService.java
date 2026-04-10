@@ -3,17 +3,16 @@ package com.agricultura.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import org.springframework.security.access.AccessDeniedException;
-
-import com.agricultura.domain.StatusCultura;
-import com.agricultura.exception.ResourceNotFoundException;
 import com.agricultura.domain.Cultura;
+import com.agricultura.domain.StatusCultura;
 import com.agricultura.domain.Usuario;
 import com.agricultura.dto.CulturaRequest;
 import com.agricultura.dto.CulturaResponse;
+import com.agricultura.exception.ResourceNotFoundException;
 import com.agricultura.repository.CulturaRepository;
 import com.agricultura.repository.UsuarioRepository;
 
@@ -35,8 +34,9 @@ public class CulturaService {
 
     @Transactional(readOnly = true)
     public CulturaResponse findById(Long id, Long userId) {
-        Cultura cultura =
-                culturaRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Cultura não encontrada"));
+        Cultura cultura = culturaRepository
+                .findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Cultura não encontrada"));
 
         if (!cultura.getUser().getId().equals(userId)) {
             throw new AccessDeniedException("Acesso negado a esta cultura");
@@ -67,22 +67,22 @@ public class CulturaService {
 
     @Transactional
     public CulturaResponse update(Long id, CulturaRequest request, Long userId) {
-        Cultura cultura =
-                culturaRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Cultura não encontrada"));
+        Cultura cultura = culturaRepository
+                .findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Cultura não encontrada"));
 
         if (!cultura.getUser().getId().equals(userId)) {
             throw new AccessDeniedException("Acesso negado a esta cultura");
         }
 
         cultura.atualizarDados(
-            request.getNome(),
-            java.math.BigDecimal.valueOf(request.getArea()),
-            request.getStatus(),
-            request.getDataPlantio(),
-            request.getPrevisaoColheita(),
-            request.getIcone(),
-            request.getProgress()
-        );
+                request.getNome(),
+                java.math.BigDecimal.valueOf(request.getArea()),
+                request.getStatus(),
+                request.getDataPlantio(),
+                request.getPrevisaoColheita(),
+                request.getIcone(),
+                request.getProgress());
 
         cultura = culturaRepository.save(cultura);
 

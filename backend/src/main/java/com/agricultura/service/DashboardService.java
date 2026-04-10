@@ -83,8 +83,9 @@ public class DashboardService {
                 .map(cultura -> {
                     // Estimativa baseada no progresso e status
                     int progresso = cultura.getProgress() != null ? cultura.getProgress() : 50;
-                    String status =
-                            cultura.getStatus() != null ? cultura.getStatus().name().toLowerCase() : "";
+                    String status = cultura.getStatus() != null
+                            ? cultura.getStatus().name().toLowerCase()
+                            : "";
 
                     // Fator de produtividade baseado no status
                     BigDecimal fator = BigDecimal.valueOf(1.0);
@@ -177,7 +178,8 @@ public class DashboardService {
 
         // Adicionar atividades baseadas nas culturas
         culturas.forEach(cultura -> {
-            String tipoAtividade = getTipoAtividade(cultura.getStatus() != null ? cultura.getStatus().name() : null);
+            String tipoAtividade = getTipoAtividade(
+                    cultura.getStatus() != null ? cultura.getStatus().name() : null);
             String iconeTipo = getIconePorTipoAtividade("CULTURA", tipoAtividade);
             String corFundo = getCorFundoPorTipo(iconeTipo);
 
@@ -225,7 +227,6 @@ public class DashboardService {
                 .limit(10)
                 .collect(Collectors.toList());
     }
-
 
     private String getTipoAtividade(String status) {
         if (status == null) return "Cultura iniciada";

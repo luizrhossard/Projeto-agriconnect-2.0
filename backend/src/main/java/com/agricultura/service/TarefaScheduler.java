@@ -28,8 +28,8 @@ public class TarefaScheduler {
         LocalDate amanha = hoje.plusDays(1);
         List<String> statusAtivos = List.of("PENDENTE", "EM_ANDAMENTO");
 
-        List<Tarefa> tarefasRelevantes = tarefaRepository
-                .findByDataVencimentoInAndStatusIn(List.of(hoje.minusDays(1), hoje, amanha), statusAtivos);
+        List<Tarefa> tarefasRelevantes = tarefaRepository.findByDataVencimentoInAndStatusIn(
+                List.of(hoje.minusDays(1), hoje, amanha), statusAtivos);
 
         for (Tarefa tarefa : tarefasRelevantes) {
             Long usuarioId = tarefa.getUser().getId();

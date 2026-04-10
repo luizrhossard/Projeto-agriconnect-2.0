@@ -69,7 +69,14 @@ public class Cultura {
     }
 
     // Método encapsulado para DDD
-    public void atualizarDados(String nome, BigDecimal area, StatusCultura status, LocalDate dataPlantio, LocalDate previsaoColheita, String icone, Integer progress) {
+    public void atualizarDados(
+            String nome,
+            BigDecimal area,
+            StatusCultura status,
+            LocalDate dataPlantio,
+            LocalDate previsaoColheita,
+            String icone,
+            Integer progress) {
         if (nome != null) this.nome = nome;
         if (area != null) this.area = area;
         if (status != null) this.status = status;

@@ -101,7 +101,9 @@ class TarefaServiceTest {
     void findById_AccessDenied_ThrowsException() {
         when(tarefaRepository.findById(1L)).thenReturn(Optional.of(tarefa));
 
-        assertThrows(org.springframework.security.access.AccessDeniedException.class, () -> tarefaService.findById(1L, 999L));
+        assertThrows(
+                org.springframework.security.access.AccessDeniedException.class,
+                () -> tarefaService.findById(1L, 999L));
     }
 
     @Test

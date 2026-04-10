@@ -16,8 +16,8 @@ import com.agricultura.dto.InsumoRequest;
 import com.agricultura.dto.InsumoResponse;
 import com.agricultura.dto.MovimentoEstoqueRequest;
 import com.agricultura.dto.MovimentoEstoqueResponse;
-import com.agricultura.exception.ResourceNotFoundException;
 import com.agricultura.exception.BusinessException;
+import com.agricultura.exception.ResourceNotFoundException;
 import com.agricultura.repository.InsumoRepository;
 import com.agricultura.repository.MovimentoEstoqueRepository;
 import com.agricultura.repository.UsuarioRepository;
@@ -139,7 +139,8 @@ public class InsumoService {
             insumo.setQuantidade(insumo.getQuantidade().add(quantidade));
         } else if ("SAIDA".equals(tipo)) {
             if (insumo.getQuantidade().compareTo(quantidade) < 0) {
-                throw new BusinessException("Estoque insuficiente: disponível " + insumo.getQuantidade() + ", solicitado " + quantidade);
+                throw new BusinessException(
+                        "Estoque insuficiente: disponível " + insumo.getQuantidade() + ", solicitado " + quantidade);
             }
             insumo.setQuantidade(insumo.getQuantidade().subtract(quantidade));
         }

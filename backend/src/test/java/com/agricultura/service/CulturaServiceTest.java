@@ -6,10 +6,6 @@ import static org.mockito.Mockito.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-
-import com.agricultura.domain.StatusCultura;
-import com.agricultura.exception.ResourceNotFoundException;
-import org.springframework.security.access.AccessDeniedException;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,11 +15,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.access.AccessDeniedException;
 
 import com.agricultura.domain.Cultura;
+import com.agricultura.domain.StatusCultura;
 import com.agricultura.domain.Usuario;
 import com.agricultura.dto.CulturaRequest;
 import com.agricultura.dto.CulturaResponse;
+import com.agricultura.exception.ResourceNotFoundException;
 import com.agricultura.repository.CulturaRepository;
 import com.agricultura.repository.UsuarioRepository;
 
@@ -123,7 +122,8 @@ class CulturaServiceTest {
         request.setArea(20.0);
         request.setDataPlantio(LocalDate.now());
 
-        when(usuarioRepository.getReferenceById(1L)).thenThrow(new jakarta.persistence.EntityNotFoundException("Usuário não encontrado"));
+        when(usuarioRepository.getReferenceById(1L))
+                .thenThrow(new jakarta.persistence.EntityNotFoundException("Usuário não encontrado"));
 
         assertThrows(jakarta.persistence.EntityNotFoundException.class, () -> culturaService.create(request, 1L));
     }
