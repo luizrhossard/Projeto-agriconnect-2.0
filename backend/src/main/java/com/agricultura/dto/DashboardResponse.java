@@ -2,7 +2,6 @@ package com.agricultura.dto;
 
 import java.math.BigDecimal;
 import java.util.List;
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

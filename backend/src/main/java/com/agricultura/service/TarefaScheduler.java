@@ -1,16 +1,13 @@
 package com.agricultura.service;
 
-import java.time.LocalDate;
-import java.util.List;
-
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
-
 import com.agricultura.domain.Tarefa;
 import com.agricultura.repository.TarefaRepository;
-
+import java.time.LocalDate;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor

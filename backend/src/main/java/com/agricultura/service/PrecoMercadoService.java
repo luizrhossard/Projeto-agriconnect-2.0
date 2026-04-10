@@ -1,12 +1,5 @@
 package com.agricultura.service;
 
-import java.math.BigDecimal;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.agricultura.domain.PrecoMercado;
 import com.agricultura.domain.Usuario;
 import com.agricultura.dto.PrecoMercadoRequest;
@@ -14,8 +7,12 @@ import com.agricultura.dto.PrecoMercadoResponse;
 import com.agricultura.exception.ResourceNotFoundException;
 import com.agricultura.repository.PrecoMercadoRepository;
 import com.agricultura.repository.UsuarioRepository;
-
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor

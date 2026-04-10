@@ -127,10 +127,6 @@
                 <configuration>
                     <java>
                         <palantirJavaFormat/>
-                        <importOrder>
-                            <order>java,javax,org,com,</order>
-                        </importOrder>
-                        <removeUnusedImports/>
                         <formatAnnotations/>
                     </java>
                 </configuration>

@@ -1,12 +1,10 @@
 package com.agricultura.repository;
 
+import com.agricultura.domain.PrecoMercado;
 import java.util.List;
-
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
-
-import com.agricultura.domain.PrecoMercado;
 
 @Repository
 public interface PrecoMercadoRepository extends JpaRepository<PrecoMercado, Long> {

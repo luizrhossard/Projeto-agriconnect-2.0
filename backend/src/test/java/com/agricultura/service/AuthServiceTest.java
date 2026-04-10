@@ -5,9 +5,14 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
+import com.agricultura.domain.Usuario;
+import com.agricultura.dto.AuthResponse;
+import com.agricultura.dto.LoginRequest;
+import com.agricultura.dto.RegisterRequest;
+import com.agricultura.repository.UsuarioRepository;
+import com.agricultura.security.JwtService;
 import java.util.Collections;
 import java.util.Optional;
-
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,13 +24,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-
-import com.agricultura.domain.Usuario;
-import com.agricultura.dto.AuthResponse;
-import com.agricultura.dto.LoginRequest;
-import com.agricultura.dto.RegisterRequest;
-import com.agricultura.repository.UsuarioRepository;
-import com.agricultura.security.JwtService;
 
 @ExtendWith(MockitoExtension.class)
 class AuthServiceTest {

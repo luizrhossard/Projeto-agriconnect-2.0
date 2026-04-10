@@ -1,16 +1,13 @@
 package com.agricultura.service;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.agricultura.domain.Notificacao;
 import com.agricultura.dto.NotificacaoResponse;
 import com.agricultura.repository.NotificacaoRepository;
-
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor

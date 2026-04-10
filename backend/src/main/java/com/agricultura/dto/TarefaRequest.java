@@ -1,9 +1,8 @@
 package com.agricultura.dto;
 
-import java.time.LocalDate;
-
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import java.time.LocalDate;
 import lombok.Data;
 
 @Data

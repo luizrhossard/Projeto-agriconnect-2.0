@@ -1,8 +1,7 @@
 package com.agricultura.dto;
 
-import java.math.BigDecimal;
-
 import jakarta.validation.constraints.*;
+import java.math.BigDecimal;
 import lombok.*;
 
 @Data

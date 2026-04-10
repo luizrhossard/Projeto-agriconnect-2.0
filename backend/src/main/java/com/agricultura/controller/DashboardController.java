@@ -1,13 +1,11 @@
 package com.agricultura.controller;
 
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import com.agricultura.dto.*;
 import com.agricultura.service.AuthService;
 import com.agricultura.service.DashboardService;
-
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/dashboard")

@@ -1,11 +1,5 @@
 package com.agricultura.service;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.agricultura.domain.Cultura;
 import com.agricultura.domain.Tarefa;
 import com.agricultura.domain.Usuario;
@@ -15,8 +9,11 @@ import com.agricultura.exception.ResourceNotFoundException;
 import com.agricultura.repository.CulturaRepository;
 import com.agricultura.repository.TarefaRepository;
 import com.agricultura.repository.UsuarioRepository;
-
+import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor

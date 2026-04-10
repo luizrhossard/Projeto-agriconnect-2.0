@@ -1,0 +1,5 @@
+# Forçar arquivos Java a usar final de linha LF (Linux) para evitar erros do Spotless
+*.java text eol=lf
+*.xml text eol=lf
+*.yml text eol=lf
+*.md text eol=lf
