@@ -1,6 +1,6 @@
 -- V2: Criar tabelas de insumo e movimento de estoque
 
-CREATE TABLE insumo (
+CREATE TABLE IF NOT EXISTS insumo (
     id BIGSERIAL PRIMARY KEY,
     nome VARCHAR(255) NOT NULL,
     tipo VARCHAR(100) NOT NULL DEFAULT 'FERTILIZANTE',
@@ -16,7 +16,7 @@ CREATE TABLE insumo (
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE movimento_estoque (
+CREATE TABLE IF NOT EXISTS movimento_estoque (
     id BIGSERIAL PRIMARY KEY,
     tipo VARCHAR(20) NOT NULL DEFAULT 'ENTRADA',
     quantidade DECIMAL(10,2) NOT NULL,
@@ -30,7 +30,7 @@ CREATE TABLE movimento_estoque (
 );
 
 -- Índices para performance
-CREATE INDEX idx_insumo_user_id ON insumo(user_id);
-CREATE INDEX idx_insumo_user_estoque ON insumo(user_id, quantidade);
-CREATE INDEX idx_movimento_estoque_insumo_id ON movimento_estoque(insumo_id);
-CREATE INDEX idx_movimento_estoque_user_id ON movimento_estoque(user_id);
+CREATE INDEX IF NOT EXISTS idx_insumo_user_id ON insumo(user_id);
+CREATE INDEX IF NOT EXISTS idx_insumo_user_estoque ON insumo(user_id, quantidade);
+CREATE INDEX IF NOT EXISTS idx_movimento_estoque_insumo_id ON movimento_estoque(insumo_id);
+CREATE INDEX IF NOT EXISTS idx_movimento_estoque_user_id ON movimento_estoque(user_id);
