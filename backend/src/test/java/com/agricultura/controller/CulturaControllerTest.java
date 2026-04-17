@@ -11,6 +11,7 @@ import com.agricultura.dto.CulturaRequest;
 import com.agricultura.dto.CulturaResponse;
 import com.agricultura.security.JwtAuthenticationFilter;
 import com.agricultura.security.JwtService;
+import com.agricultura.security.RateLimitFilter;
 import com.agricultura.service.AuthService;
 import com.agricultura.service.CulturaService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,6 +25,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -49,6 +51,12 @@ class CulturaControllerTest {
 
     @MockBean
     private JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    @MockBean
+    private RateLimitFilter rateLimitFilter;
+
+    @MockBean
+    private StringRedisTemplate stringRedisTemplate;
 
     private CulturaResponse culturaResponse;
 

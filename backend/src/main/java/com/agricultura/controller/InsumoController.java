@@ -68,7 +68,8 @@ public class InsumoController {
     @GetMapping("/{id}/movimentos")
     public ResponseEntity<Page<MovimentoEstoqueResponse>> findMovimentosByInsumo(
             @PathVariable Long id, @PageableDefault(size = 10) Pageable pageable) {
-        return ResponseEntity.ok(insumoService.findMovimentosByInsumo(id, pageable));
+        Long userId = authService.getCurrentUserId();
+        return ResponseEntity.ok(insumoService.findMovimentosByInsumo(id, userId, pageable));
     }
 
     @GetMapping("/movimentos")

@@ -135,6 +135,7 @@ npm run dev
 - Spring Security + JWT
 - Spring Data JPA
 - PostgreSQL
+- Redis (rate limiting + login attempt tracking)
 - Flyway (migrations)
 - Maven
 
@@ -156,8 +157,12 @@ npm run dev
 SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/agricultura
 SPRING_DATASOURCE_USERNAME=agricultura
 SPRING_DATASOURCE_PASSWORD=agricultura123  # ⚠️ Apenas para dev! Use senha forte em produção
+SPRING_DATA_REDIS_HOST=redis               # ⚠️ Host do Redis (docker service name ou localhost)
+SPRING_DATA_REDIS_PORT=6379
 APP_JWT_SECRET=chave-secreta-jwt           # ⚠️ Apenas para dev! Gere uma chave forte (32+ caracteres)
 APP_JWT_EXPIRATION=86400000
+APP_RATE_LIMIT_ENABLED=true                # Habilita rate limiting de API
+APP_RATE_LIMIT_REQUESTS_PER_MINUTE=60      # Máximo de requisições por minuto por IP
 ```
 
 > **🔐 Gerando JWT_SECRET seguro:**
@@ -192,6 +197,9 @@ docker-compose logs -f backend
 
 # Acessar banco
 docker-compose exec postgres psql -U agricultura -d agricultura
+
+# Acessar Redis
+docker-compose exec redis redis-cli
 ```
 
 ### Qualidade de Código
@@ -215,8 +223,8 @@ mvn test jacoco:check
 
 ### 📊 Métricas de Testes
 
-- **Total de testes**: 28
-- **Tipos**: Unitários (Services) + Controller Tests (WebMvcTest)
+- **Total de testes**: 45
+- **Tipos**: Unitários (Services) + Controller Tests (WebMvcTest) + Security Filter Tests
 - **Cobertura mínima**: 70% (configurado no JaCoCo)
 - **Relatório HTML**: `target/site/jacoco/index.html`
 
@@ -345,4 +353,8 @@ grep -q "\.env" .gitignore && echo "✓ .env está no .gitignore" || echo "✗ A
 ## 📄 Licença
 
 MIT License
+
+## 📄 Documentação Adicional
+
+- [Análise Técnica do Projeto](./ANALISE_TECNICA.md)
 

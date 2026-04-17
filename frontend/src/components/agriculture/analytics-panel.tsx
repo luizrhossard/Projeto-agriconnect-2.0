@@ -86,6 +86,9 @@ const recentActivities = [
   { date: '08 Jan', activity: 'Plantio concluído', crop: 'Feijão', area: '50 ha', icon: '🌱' },
 ]
 
+const toMetricNumber = (value: number | null | undefined, fallback = 0) =>
+  typeof value === 'number' && Number.isFinite(value) ? value : fallback
+
 export function AnalyticsPanel() {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [isAnalysisOpen, setIsAnalysisOpen] = useState(false)
@@ -118,16 +121,16 @@ export function AnalyticsPanel() {
       setAtividades(dashboard.atividadesRecentes || [])
       
       // Atualizar métricas com dados reais
-      if (dashboard.produtividadeMedia) {
+      if (dashboard.produtividadeMedia !== undefined) {
         setMetricas({
-          produtividadeMedia: dashboard.produtividadeMedia.doubleValue(),
-          variacaoProdutividade: dashboard.variacaoProdutividade?.doubleValue() || 0,
-          eficienciaHidrica: dashboard.eficienciaHidrica?.doubleValue() || 0,
-          variacaoUsoAgua: dashboard.variacaoUsoAgua?.doubleValue() || 0,
-          custoPorHectare: dashboard.custoPorHectare?.doubleValue() || 0,
-          variacaoCusto: dashboard.variacaoCusto?.doubleValue() || 0,
-          areaColhida: dashboard.areaColhida?.doubleValue() || 0,
-          variacaoAreaColhida: dashboard.variacaoAreaColhida?.doubleValue() || 0
+          produtividadeMedia: toMetricNumber(dashboard.produtividadeMedia),
+          variacaoProdutividade: toMetricNumber(dashboard.variacaoProdutividade),
+          eficienciaHidrica: toMetricNumber(dashboard.eficienciaHidrica),
+          variacaoUsoAgua: toMetricNumber(dashboard.variacaoUsoAgua),
+          custoPorHectare: toMetricNumber(dashboard.custoPorHectare),
+          variacaoCusto: toMetricNumber(dashboard.variacaoCusto),
+          areaColhida: toMetricNumber(dashboard.areaColhida),
+          variacaoAreaColhida: toMetricNumber(dashboard.variacaoAreaColhida)
         })
       }
     } catch (error) {

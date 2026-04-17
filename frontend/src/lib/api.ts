@@ -93,6 +93,14 @@ export interface DashboardResponse {
   ultimasCulturas: CulturaResponse[];
   tarefasPendentesList: TarefaResponse[];
   atividadesRecentes: AtividadeRecenteResponse[];
+  produtividadeMedia?: number;
+  variacaoProdutividade?: number;
+  eficienciaHidrica?: number;
+  variacaoUsoAgua?: number;
+  custoPorHectare?: number;
+  variacaoCusto?: number;
+  areaColhida?: number;
+  variacaoAreaColhida?: number;
 }
 
 export interface AtividadeRecenteResponse {
@@ -180,37 +188,24 @@ class ApiError extends Error {
   }
 }
 
-function getAuthToken(): string | null {
-  if (typeof window !== 'undefined') {
-    return localStorage.getItem('token');
-  }
-  return null;
-}
-
 async function authenticatedFetch(
   url: string,
   options: RequestInit = {}
 ): Promise<Response> {
-  const token = getAuthToken();
-
   const headers: HeadersInit = {
     'Content-Type': 'application/json',
     ...(options.headers || {}),
   };
 
-  if (token) {
-    (headers as Record<string, string>)['Authorization'] = `Bearer ${token}`;
-  }
-
   const response = await fetch(url, {
     ...options,
     headers,
+    credentials: 'include',
   });
 
   if (!response.ok) {
     // Token expirado ou inválido (401) - limpa o token e redireciona para login
     if (response.status === 401) {
-      localStorage.removeItem('token');
       if (typeof window !== 'undefined') {
         window.location.href = '/login';
       }
@@ -240,6 +235,7 @@ export const api = {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(data),
+        credentials: 'include',
       });
       if (!response.ok) {
         const error = await response.json().catch(() => ({ message: 'Erro de login' }));
@@ -255,6 +251,7 @@ export const api = {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(data),
+        credentials: 'include',
       });
       if (!response.ok) {
         const error = await response.json().catch(() => ({ message: 'Erro de registro' }));
@@ -266,6 +263,12 @@ export const api = {
     getCurrentUser: async (): Promise<UsuarioResponse> => {
       const response = await authenticatedFetch(`${API_BASE_URL}/api/auth/me`);
       return response.json();
+    },
+
+    logout: async (): Promise<void> => {
+      await authenticatedFetch(`${API_BASE_URL}/api/auth/logout`, {
+        method: 'POST',
+      });
     },
   },
 
@@ -386,18 +389,18 @@ export const api = {
   },
 
   notificacoes: {
-    getAll: async (usuarioId: number): Promise<NotificacaoResponse[]> => {
-      const response = await authenticatedFetch(`${API_BASE_URL}/api/notificacoes?usuarioId=${usuarioId}`);
+    getAll: async (): Promise<NotificacaoResponse[]> => {
+      const response = await authenticatedFetch(`${API_BASE_URL}/api/notificacoes`);
       return response.json();
     },
 
-    getNaoLidas: async (usuarioId: number): Promise<NotificacaoResponse[]> => {
-      const response = await authenticatedFetch(`${API_BASE_URL}/api/notificacoes/nao-lidas?usuarioId=${usuarioId}`);
+    getNaoLidas: async (): Promise<NotificacaoResponse[]> => {
+      const response = await authenticatedFetch(`${API_BASE_URL}/api/notificacoes/nao-lidas`);
       return response.json();
     },
 
-    getContagem: async (usuarioId: number): Promise<{ quantidade: number }> => {
-      const response = await authenticatedFetch(`${API_BASE_URL}/api/notificacoes/contagem?usuarioId=${usuarioId}`);
+    getContagem: async (): Promise<{ quantidade: number }> => {
+      const response = await authenticatedFetch(`${API_BASE_URL}/api/notificacoes/contagem`);
       return response.json();
     },
 
@@ -407,8 +410,8 @@ export const api = {
       });
     },
 
-    marcarTodasComoLidas: async (usuarioId: number): Promise<void> => {
-      await authenticatedFetch(`${API_BASE_URL}/api/notificacoes/ler-todas?usuarioId=${usuarioId}`, {
+    marcarTodasComoLidas: async (): Promise<void> => {
+      await authenticatedFetch(`${API_BASE_URL}/api/notificacoes/ler-todas`, {
         method: 'PUT',
       });
     },

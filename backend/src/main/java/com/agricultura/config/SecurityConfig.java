@@ -1,6 +1,7 @@
 package com.agricultura.config;
 
 import com.agricultura.security.JwtAuthenticationFilter;
+import com.agricultura.security.RateLimitFilter;
 import java.util.Arrays;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -31,26 +32,37 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthFilter;
+    private final RateLimitFilter rateLimitFilter;
     private final UserDetailsService userDetailsService;
 
-    @Value("${app.cors.allowed-origins:http://localhost:3000}")
+    @Value("${app.cors.allowed-origins}")
     private String allowedOrigins;
+
+    @Value("${app.swagger.enabled:false}")
+    private boolean swaggerEnabled;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .authorizeHttpRequests(auth -> auth.requestMatchers(
-                                "/api/auth/**", "/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html")
-                        .permitAll()
-                        .requestMatchers("/api/usuarios/**")
-                        .hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.OPTIONS, "/**")
-                        .permitAll()
-                        .anyRequest()
-                        .authenticated())
+                .authorizeHttpRequests(auth -> {
+                    auth.requestMatchers("/api/auth/**").permitAll();
+
+                    if (swaggerEnabled) {
+                        auth.requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html")
+                                .permitAll();
+                    }
+
+                    auth.requestMatchers("/api/usuarios/**")
+                            .hasRole("ADMIN")
+                            .requestMatchers(HttpMethod.OPTIONS, "/**")
+                            .permitAll()
+                            .anyRequest()
+                            .authenticated();
+                })
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
+                .addFilterBefore(rateLimitFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
@@ -61,9 +73,10 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         List<String> origins = Arrays.asList(allowedOrigins.split(","));
         configuration.setAllowedOrigins(origins);
+        configuration.setAllowCredentials(true);
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept", "X-Requested-With"));
-        configuration.setExposedHeaders(Arrays.asList("Authorization", "Content-Disposition"));
+        configuration.setExposedHeaders(Arrays.asList("Set-Cookie"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

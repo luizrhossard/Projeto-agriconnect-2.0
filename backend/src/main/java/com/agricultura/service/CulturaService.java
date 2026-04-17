@@ -33,7 +33,7 @@ public class CulturaService {
     public CulturaResponse findById(Long id, Long userId) {
         Cultura cultura = culturaRepository
                 .findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Cultura não encontrada"));
+                .orElseThrow(() -> new ResourceNotFoundException("Cultura nÃ£o encontrada"));
 
         if (!cultura.getUser().getId().equals(userId)) {
             throw new AccessDeniedException("Acesso negado a esta cultura");
@@ -66,7 +66,7 @@ public class CulturaService {
     public CulturaResponse update(Long id, CulturaRequest request, Long userId) {
         Cultura cultura = culturaRepository
                 .findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Cultura não encontrada"));
+                .orElseThrow(() -> new ResourceNotFoundException("Cultura nÃ£o encontrada"));
 
         if (!cultura.getUser().getId().equals(userId)) {
             throw new AccessDeniedException("Acesso negado a esta cultura");
@@ -88,11 +88,12 @@ public class CulturaService {
 
     @Transactional
     public void delete(Long id, Long userId) {
-        Cultura cultura =
-                culturaRepository.findById(id).orElseThrow(() -> new RuntimeException("Cultura não encontrada"));
+        Cultura cultura = culturaRepository
+                .findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Cultura não encontrada"));
 
         if (!cultura.getUser().getId().equals(userId)) {
-            throw new RuntimeException("Acesso negado a esta cultura");
+            throw new AccessDeniedException("Acesso negado a esta cultura");
         }
 
         culturaRepository.delete(cultura);

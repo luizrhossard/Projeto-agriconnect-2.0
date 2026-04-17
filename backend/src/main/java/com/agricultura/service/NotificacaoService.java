@@ -3,6 +3,7 @@ package com.agricultura.service;
 import com.agricultura.domain.Notificacao;
 import com.agricultura.domain.Usuario;
 import com.agricultura.dto.NotificacaoResponse;
+import com.agricultura.exception.ResourceNotFoundException;
 import com.agricultura.repository.NotificacaoRepository;
 import com.agricultura.repository.UsuarioRepository;
 import java.util.List;
@@ -52,11 +53,13 @@ public class NotificacaoService {
     }
 
     @Transactional
-    public void marcarComoLida(Long notificacaoId) {
-        notificacaoRepository.findById(notificacaoId).ifPresent(notificacao -> {
-            notificacao.setLida(true);
-            notificacaoRepository.save(notificacao);
-        });
+    public void marcarComoLida(Long notificacaoId, Long usuarioId) {
+        Notificacao notificacao = notificacaoRepository
+                .findByIdAndUsuarioId(notificacaoId, usuarioId)
+                .orElseThrow(() -> new ResourceNotFoundException("NotificaÃ§Ã£o nÃ£o encontrada"));
+
+        notificacao.setLida(true);
+        notificacaoRepository.save(notificacao);
     }
 
     @Transactional

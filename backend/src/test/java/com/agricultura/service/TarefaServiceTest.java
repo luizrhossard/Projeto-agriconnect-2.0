@@ -53,7 +53,7 @@ class TarefaServiceTest {
                 .email("test@example.com")
                 .build();
 
-        cultura = Cultura.builder().id(1L).nome("Milho").build();
+        cultura = Cultura.builder().id(1L).nome("Milho").user(usuario).build();
 
         tarefa = Tarefa.builder()
                 .id(1L)
@@ -150,6 +150,55 @@ class TarefaServiceTest {
 
         assertNotNull(result);
         verify(culturaRepository).findById(1L);
+    }
+
+    @Test
+    void create_WithCulturaFromAnotherUser_AccessDenied() {
+        TarefaRequest request = new TarefaRequest();
+        request.setTitulo("Nova tarefa");
+        request.setDataVencimento(LocalDate.now().plusDays(5));
+        request.setCulturaId(1L);
+
+        Usuario outroUsuario = Usuario.builder().id(2L).name("Outro").email("outro@example.com").build();
+        Cultura culturaDeOutroUsuario = Cultura.builder()
+                .id(1L)
+                .nome("Cultura de Outro Usuario")
+                .user(outroUsuario)
+                .build();
+
+        when(usuarioRepository.getReferenceById(1L)).thenReturn(usuario);
+        when(culturaRepository.findById(1L)).thenReturn(Optional.of(culturaDeOutroUsuario));
+
+        assertThrows(
+                org.springframework.security.access.AccessDeniedException.class, () -> tarefaService.create(request, 1L));
+
+        verify(tarefaRepository, never()).save(any(Tarefa.class));
+    }
+
+    @Test
+    void update_WithCulturaFromAnotherUser_AccessDenied() {
+        TarefaRequest request = new TarefaRequest();
+        request.setTitulo("Atualizar tarefa");
+        request.setDescricao("Descricao");
+        request.setPrioridade("MEDIA");
+        request.setStatus("PENDENTE");
+        request.setDataVencimento(LocalDate.now().plusDays(3));
+        request.setCulturaId(1L);
+
+        Usuario outroUsuario = Usuario.builder().id(2L).name("Outro").email("outro@example.com").build();
+        Cultura culturaDeOutroUsuario = Cultura.builder()
+                .id(1L)
+                .nome("Cultura de Outro Usuario")
+                .user(outroUsuario)
+                .build();
+
+        when(tarefaRepository.findById(1L)).thenReturn(Optional.of(tarefa));
+        when(culturaRepository.findById(1L)).thenReturn(Optional.of(culturaDeOutroUsuario));
+
+        assertThrows(
+                org.springframework.security.access.AccessDeniedException.class, () -> tarefaService.update(1L, request, 1L));
+
+        verify(tarefaRepository, never()).save(any(Tarefa.class));
     }
 
     @Test

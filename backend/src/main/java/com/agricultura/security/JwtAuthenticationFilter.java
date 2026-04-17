@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -36,15 +37,24 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain)
             throws ServletException, IOException {
         final String authHeader = request.getHeader("Authorization");
-        final String jwt;
+        String jwt = null;
         final String userEmail;
 
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            jwt = authHeader.substring(7);
+        } else if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if ("access_token".equals(cookie.getName()) && cookie.getValue() != null) {
+                    jwt = cookie.getValue();
+                    break;
+                }
+            }
+        }
+
+        if (jwt == null || jwt.isBlank()) {
             filterChain.doFilter(request, response);
             return;
         }
-
-        jwt = authHeader.substring(7);
 
         try {
             userEmail = jwtService.extractUsername(jwt);
@@ -60,6 +70,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 }
             }
         } catch (ExpiredJwtException e) {
+            if (request.getRequestURI().startsWith("/api/auth/")) {
+                filterChain.doFilter(request, response);
+                return;
+            }
             String expiredUserEmail = e.getClaims().getSubject();
             log.warn("Token JWT expirado para usuário: {}", expiredUserEmail);
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -74,6 +88,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             objectMapper.writeValue(response.getWriter(), errorResponse);
             return;
         } catch (Exception e) {
+            if (request.getRequestURI().startsWith("/api/auth/")) {
+                filterChain.doFilter(request, response);
+                return;
+            }
             log.error("Não foi possível definir a autenticação do usuário", e);
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
             response.setContentType("application/json");

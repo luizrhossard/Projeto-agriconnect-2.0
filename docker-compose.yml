@@ -16,6 +16,20 @@ services:
       timeout: 5s
       retries: 5
 
+  redis:
+    image: redis:7-alpine
+    container_name: agricultura-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
   backend:
     build:
       context: ./backend
@@ -26,12 +40,18 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/agricultura
       SPRING_DATASOURCE_USERNAME: agricultura
       SPRING_DATASOURCE_PASSWORD: agricultura123
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
       APP_JWT_SECRET: cHJveWV0by1zcHJpbmctYWdyaWN1bHR1cmEtc2VjcmV0LWtleS0yMDI0LW11aXRvLXNlZ3VyYS1lLWxvbmdhLTEyMzQ1Njc4OTA=
       APP_JWT_EXPIRATION: 86400000
+      APP_RATE_LIMIT_ENABLED: true
+      APP_RATE_LIMIT_REQUESTS_PER_MINUTE: 60
     ports:
       - "8080:8080"
     depends_on:
       postgres:
+        condition: service_healthy
+      redis:
         condition: service_healthy
     restart: unless-stopped
 
@@ -53,6 +73,7 @@ services:
 
 volumes:
   postgres_data:
+  redis_data:
 
 networks:
   default:

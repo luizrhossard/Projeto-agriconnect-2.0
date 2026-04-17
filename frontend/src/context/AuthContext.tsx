@@ -1,12 +1,11 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
-import api, { AuthResponse, LoginRequest, RegisterRequest, UsuarioResponse } from '@/lib/api';
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
+import api, { LoginRequest, RegisterRequest, UsuarioResponse } from '@/lib/api';
 
 interface AuthContextType {
   user: UsuarioResponse | null;
-  token: string | null;
   isLoading: boolean;
   isAuthenticated: boolean;
   login: (data: LoginRequest) => Promise<void>;
@@ -18,41 +17,43 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<UsuarioResponse | null>(null);
-  const [token, setToken] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
   const pathname = usePathname();
 
   useEffect(() => {
-    const storedToken = localStorage.getItem('token');
-    if (storedToken) {
-      setToken(storedToken);
-    }
+    const initializeAuth = async () => {
+      try {
+        const currentUser = await api.auth.getCurrentUser();
+        setUser(currentUser);
+      } catch {
+        setUser(null);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    initializeAuth();
   }, []);
 
   useEffect(() => {
+    if (isLoading) return;
+
     const isAuthPage = pathname === '/login' || pathname === '/register';
-    
-    if (!token && !isAuthPage) {
+
+    if (!user && !isAuthPage) {
       router.push('/login');
-    } else if (token && isAuthPage) {
+    } else if (user && isAuthPage) {
       router.push('/');
     }
-  }, [token, pathname, router]);
+  }, [isLoading, user, pathname, router]);
 
   const login = async (data: LoginRequest) => {
     setIsLoading(true);
     try {
-      const response: AuthResponse = await api.auth.login(data);
-      localStorage.setItem('token', response.token);
-      setToken(response.token);
-      setUser({
-        id: response.id,
-        name: response.name,
-        email: response.email,
-        role: response.role,
-        createdAt: new Date().toISOString(),
-      });
+      await api.auth.login(data);
+      const currentUser = await api.auth.getCurrentUser();
+      setUser(currentUser);
       router.push('/');
     } finally {
       setIsLoading(false);
@@ -62,16 +63,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const register = async (data: RegisterRequest) => {
     setIsLoading(true);
     try {
-      const response: AuthResponse = await api.auth.register(data);
-      localStorage.setItem('token', response.token);
-      setToken(response.token);
-      setUser({
-        id: response.id,
-        name: response.name,
-        email: response.email,
-        role: response.role,
-        createdAt: new Date().toISOString(),
-      });
+      await api.auth.register(data);
+      const currentUser = await api.auth.getCurrentUser();
+      setUser(currentUser);
       router.push('/');
     } finally {
       setIsLoading(false);
@@ -79,8 +73,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const logout = () => {
-    localStorage.removeItem('token');
-    setToken(null);
+    api.auth.logout().catch(() => {});
     setUser(null);
     router.push('/login');
   };
@@ -89,9 +82,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     <AuthContext.Provider
       value={{
         user,
-        token,
         isLoading,
-        isAuthenticated: !!token,
+        isAuthenticated: !!user,
         login,
         register,
         logout,

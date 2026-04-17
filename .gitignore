@@ -1,7 +1,9 @@
 frontend/.next/
 frontend/node_modules/
+frontend/tsconfig.tsbuildinfo
 backend/target/
 backend/nul
+backend/test_output.txt
 *.class
 *.log
 test_output.txt
@@ -16,6 +18,10 @@ test_output.txt
 .vscode/
 .idea/
 *.iml
+.classpath
+.project
+.factorypath
+.settings/
 
 # OS
 .DS_Store

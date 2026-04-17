@@ -151,19 +151,8 @@ export default function Home() {
   }, [])
 
   useEffect(() => {
-    const checkAuth = () => {
-      const token = localStorage.getItem('token')
-      if (!token) {
-        router.push('/login')
-        return false
-      }
-      return true
-    }
-
-    if (checkAuth()) {
-      fetchData()
-    }
-  }, [router])
+    fetchData()
+  }, [fetchData])
 
   const handleCulturaCreated = useCallback(() => {
     fetchData()

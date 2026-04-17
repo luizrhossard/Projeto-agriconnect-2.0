@@ -12,6 +12,7 @@ import com.agricultura.repository.UsuarioRepository;
 import java.util.List;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,11 +34,12 @@ public class TarefaService {
 
     @Transactional(readOnly = true)
     public TarefaResponse findById(Long id, Long userId) {
-        Tarefa tarefa =
-                tarefaRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Tarefa não encontrada"));
+        Tarefa tarefa = tarefaRepository
+                .findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Tarefa nao encontrada"));
 
         if (!tarefa.getUser().getId().equals(userId)) {
-            throw new org.springframework.security.access.AccessDeniedException("Acesso negado a esta tarefa");
+            throw new AccessDeniedException("Acesso negado a esta tarefa");
         }
 
         return toResponse(tarefa);
@@ -57,10 +59,7 @@ public class TarefaService {
                 .build();
 
         if (request.getCulturaId() != null) {
-            Cultura cultura = culturaRepository
-                    .findById(request.getCulturaId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Cultura não encontrada"));
-            tarefa.setCultura(cultura);
+            tarefa.setCultura(buscarCulturaDoUsuario(request.getCulturaId(), userId));
         }
 
         tarefa = tarefaRepository.save(tarefa);
@@ -72,11 +71,12 @@ public class TarefaService {
 
     @Transactional
     public TarefaResponse update(Long id, TarefaRequest request, Long userId) {
-        Tarefa tarefa =
-                tarefaRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Tarefa não encontrada"));
+        Tarefa tarefa = tarefaRepository
+                .findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Tarefa nao encontrada"));
 
         if (!tarefa.getUser().getId().equals(userId)) {
-            throw new org.springframework.security.access.AccessDeniedException("Acesso negado a esta tarefa");
+            throw new AccessDeniedException("Acesso negado a esta tarefa");
         }
 
         tarefa.setTitulo(request.getTitulo());
@@ -91,10 +91,7 @@ public class TarefaService {
         tarefa.setDataVencimento(request.getDataVencimento());
 
         if (request.getCulturaId() != null) {
-            Cultura cultura = culturaRepository
-                    .findById(request.getCulturaId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Cultura não encontrada"));
-            tarefa.setCultura(cultura);
+            tarefa.setCultura(buscarCulturaDoUsuario(request.getCulturaId(), userId));
         } else {
             tarefa.setCultura(null);
         }
@@ -104,7 +101,7 @@ public class TarefaService {
         if (request.getStatus() != null
                 && "CONCLUIDA".equals(request.getStatus())
                 && !request.getStatus().equals(statusAnterior)) {
-            notificacaoService.criarNotificacao(userId, "Tarefa concluída", tarefa.getTitulo(), "SUCESSO");
+            notificacaoService.criarNotificacao(userId, "Tarefa concluida", tarefa.getTitulo(), "SUCESSO");
         }
 
         return toResponse(tarefa);
@@ -117,14 +114,27 @@ public class TarefaService {
 
     @Transactional
     public void delete(Long id, Long userId) {
-        Tarefa tarefa =
-                tarefaRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Tarefa não encontrada"));
+        Tarefa tarefa = tarefaRepository
+                .findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Tarefa nao encontrada"));
 
         if (!tarefa.getUser().getId().equals(userId)) {
-            throw new org.springframework.security.access.AccessDeniedException("Acesso negado a esta tarefa");
+            throw new AccessDeniedException("Acesso negado a esta tarefa");
         }
 
         tarefaRepository.delete(tarefa);
+    }
+
+    private Cultura buscarCulturaDoUsuario(Long culturaId, Long userId) {
+        Cultura cultura = culturaRepository
+                .findById(culturaId)
+                .orElseThrow(() -> new ResourceNotFoundException("Cultura nao encontrada"));
+
+        if (cultura.getUser() == null || !cultura.getUser().getId().equals(userId)) {
+            throw new AccessDeniedException("Acesso negado a esta cultura");
+        }
+
+        return cultura;
     }
 
     private TarefaResponse toResponse(Tarefa tarefa) {

@@ -14,5 +14,8 @@ public interface MovimentoEstoqueRepository extends JpaRepository<MovimentoEstoq
     Page<MovimentoEstoque> findByInsumoId(Long insumoId, Pageable pageable);
 
     @EntityGraph(attributePaths = {"insumo", "user"})
+    Page<MovimentoEstoque> findByInsumoIdAndUserId(Long insumoId, Long userId, Pageable pageable);
+
+    @EntityGraph(attributePaths = {"insumo", "user"})
     Page<MovimentoEstoque> findByUserId(Long userId, Pageable pageable);
 }

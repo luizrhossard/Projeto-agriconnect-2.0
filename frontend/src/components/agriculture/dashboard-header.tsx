@@ -39,8 +39,8 @@ export function DashboardHeader({ onMenuClick }: DashboardHeaderProps) {
     setIsLoadingNotificacoes(true)
     try {
       const [todas, contagem] = await Promise.all([
-        api.notificacoes.getAll(user.id),
-        api.notificacoes.getContagem(user.id)
+        api.notificacoes.getAll(),
+        api.notificacoes.getContagem()
       ])
       setNotificacoes(todas.slice(0, 10))
       setContagemNaoLidas(contagem.quantidade)
@@ -88,7 +88,7 @@ export function DashboardHeader({ onMenuClick }: DashboardHeaderProps) {
   const handleMarcarTodasLidas = async () => {
     if (!user?.id) return
     try {
-      await api.notificacoes.marcarTodasComoLidas(user.id)
+      await api.notificacoes.marcarTodasComoLidas()
       setNotificacoes(prev => prev.map(n => ({ ...n, lida: true })))
       setContagemNaoLidas(0)
     } catch (error) {

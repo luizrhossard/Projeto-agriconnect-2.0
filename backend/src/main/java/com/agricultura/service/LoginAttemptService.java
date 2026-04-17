@@ -1,48 +1,60 @@
 package com.agricultura.service;
 
-import java.util.concurrent.ConcurrentHashMap;
+import java.time.Duration;
+import java.util.concurrent.TimeUnit;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
+@Slf4j
 public class LoginAttemptService {
 
-    private final ConcurrentHashMap<String, Integer> attemptCache = new ConcurrentHashMap<>();
     private static final int MAX_ATTEMPTS = 5;
     private static final long LOCK_TIME_MINUTES = 30;
-    private final ConcurrentHashMap<String, Long> lockCache = new ConcurrentHashMap<>();
+    private static final String ATTEMPTS_KEY_PREFIX = "auth:attempts:";
+    private static final String LOCK_KEY_PREFIX = "auth:lock:";
+
+    private final StringRedisTemplate redisTemplate;
 
     public void loginSucceeded(String email) {
-        attemptCache.remove(email);
-        lockCache.remove(email);
+        String attemptsKey = ATTEMPTS_KEY_PREFIX + email;
+        String lockKey = LOCK_KEY_PREFIX + email;
+        redisTemplate.delete(attemptsKey);
+        redisTemplate.delete(lockKey);
     }
 
     public void loginFailed(String email) {
-        int attempts = attemptCache.merge(email, 1, Integer::sum);
-        if (attempts >= MAX_ATTEMPTS) {
-            lockCache.put(email, System.currentTimeMillis());
+        String attemptsKey = ATTEMPTS_KEY_PREFIX + email;
+        String lockKey = LOCK_KEY_PREFIX + email;
+
+        Long attempts = redisTemplate.increment(attemptsKey);
+        redisTemplate.expire(attemptsKey, LOCK_TIME_MINUTES, TimeUnit.MINUTES);
+
+        if (attempts != null && attempts >= MAX_ATTEMPTS) {
+            redisTemplate.opsForValue().setIfAbsent(lockKey, String.valueOf(System.currentTimeMillis()));
+            redisTemplate.expire(lockKey, LOCK_TIME_MINUTES, TimeUnit.MINUTES);
+            log.warn("Account locked for {} due to {} failed attempts", email, attempts);
         }
     }
 
     public boolean isBlocked(String email) {
-        Long lockTime = lockCache.get(email);
-        if (lockTime == null) {
-            return false;
-        }
-        long elapsedMinutes = (System.currentTimeMillis() - lockTime) / 60000;
-        if (elapsedMinutes >= LOCK_TIME_MINUTES) {
-            lockCache.remove(email);
-            attemptCache.remove(email);
+        String lockKey = LOCK_KEY_PREFIX + email;
+        String lockTimeStr = redisTemplate.opsForValue().get(lockKey);
+        if (lockTimeStr == null) {
             return false;
         }
         return true;
     }
 
     public long getRemainingLockMinutes(String email) {
-        Long lockTime = lockCache.get(email);
-        if (lockTime == null) {
+        String lockKey = LOCK_KEY_PREFIX + email;
+        Long ttl = redisTemplate.getExpire(lockKey, TimeUnit.MINUTES);
+        if (ttl == null || ttl < 0) {
             return 0;
         }
-        long elapsedMinutes = (System.currentTimeMillis() - lockTime) / 60000;
-        return Math.max(0, LOCK_TIME_MINUTES - elapsedMinutes);
+        return ttl;
     }
 }
