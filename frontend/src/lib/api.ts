@@ -1,5 +1,19 @@
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 
+function getCsrfToken(): string | null {
+  if (typeof document === 'undefined') return null;
+  const cookies = document.cookie.split(';');
+  for (const cookie of cookies) {
+    const [name, value] = cookie.trim().split('=');
+    if (name === 'XSRF-TOKEN') {
+      return value;
+    }
+  }
+  return null;
+}
+
+const WRITE_METHODS = ['POST', 'PUT', 'DELETE', 'PATCH'];
+
 export interface AuthResponse {
   token: string;
   type: string;
@@ -196,6 +210,14 @@ async function authenticatedFetch(
     'Content-Type': 'application/json',
     ...(options.headers || {}),
   };
+
+  const method = (options.method || 'GET').toUpperCase();
+  if (WRITE_METHODS.includes(method)) {
+    const csrfToken = getCsrfToken();
+    if (csrfToken) {
+      (headers as Record<string, string>)['X-XSRF-TOKEN'] = csrfToken;
+    }
+  }
 
   const response = await fetch(url, {
     ...options,

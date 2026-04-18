@@ -1,0 +1,48 @@
+# Plano de Refatoração de Segurança (CSRF e API)
+
+Este documento descreve as etapas técnicas necessárias para remover a vulnerabilidade de CSRF existente na combinação de Cookies com CSRF desativado, e para corrigir os problemas de limitação de taxa (Rate Limit) que ocorrerão com a introdução do Nginx na AWS.
+
+## User Review Required
+
+> [!WARNING]
+> **Decisão de Arquitetura Crítica**
+> Como o seu Next.js atualemente depende inteiramente do Cookie HttpOnly (`credentials: 'include'`) para fazer chamadas à API, não podemos apenas "desativar" a leitura de Cookies do backend Spring sem quebrar todo o sistema de login. 
+> 
+> **A abordagem escolhida neste plano é:** Manteremos a alta segurança dos cookies HttpOnly contra ataques XSS, e vamos habilitar a proteção oficial do Spring para CSRF (usando tokens complementares) para cobrir o buraco de ataques de falsificação transite.
+
+## Proposed Changes
+
+### Backend Spring Boot
+
+#### [MODIFY] `application-prod.properties`
+- **Por que:** Para que o `RateLimitFilter` não puna todos os IPs como sendo `127.0.0.1` sob o Nginx.
+- Adicionar a instrução para processar headers reversos:
+  `server.forward-headers-strategy=framework`
+
+#### [MODIFY] `application.properties`
+- Adicionar o mesmo header reverso por segurança na homologação local.
+
+#### [MODIFY] `SecurityConfig.java`
+- **Por que:** Ativar proteção CSRF para requisições de API protegendo as rotas que acessam com cookies.
+- Substituir o `.csrf(AbstractHttpConfigurer::disable)` para `.csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))`. Isso emite um token (legível no Javascript do Next.js) que o sistema Spring exigirá nas requisições stateful da API.
+- Adicionar no pacote `com.agricultura.config` instruções para lidar com exceção de rotas `/api/auth/login`.
+
+### Frontend Next.js
+
+#### [MODIFY] `api.ts`
+- **Por que:** O browser não manda de volta a proteção CSRF do Spring magicamente em requisições `fetch` JSON, isso tem que ser injetado.
+- Adicionar uma função que varre `document.cookie` para achar o par `XSRF-TOKEN`.
+- Modificar o interceptador `authenticatedFetch`. Se for um método de escrita (POST, PUT, DELETE, PATCH), anexaremos um novo cabeçalho dinâmico `'X-XSRF-TOKEN': valor_da_variavel`.
+
+## Open Questions
+
+> [!IMPORTANT]
+> - O frontend atual faz Server Side Rendering (SSR) que precise bater no backend do Spring, ou o consumo da API só decorre no lado do cliente (`use client`)? Esta lógica de tokens por javascript só afetará de forma limpa o cenário "Client Side", que parece ser o adotado no seu `AuthContext.tsx`.
+
+## Verification Plan
+
+### Manual Verification
+1. Fazer o Login na aplicação (Next.js).
+2. Tentar registrar um Insumo ou Cultura:
+    - Veremos no Inspecionar do Chrome/DevTools que uma chave `XSRF-TOKEN` viaja nos cabeçalhos da requisição `fetch`.
+3. Verificaremos que falhas no envio do Token retornam HTTP Status 403 (ou Similar - CSRF Blocked), atestando segurança 100% no padrão de produção.
