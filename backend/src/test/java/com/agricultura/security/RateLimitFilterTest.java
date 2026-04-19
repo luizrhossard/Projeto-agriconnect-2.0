@@ -82,7 +82,8 @@ class RateLimitFilterTest {
         when(request.getRequestURI()).thenReturn("/api/culturas");
         when(request.getRemoteAddr()).thenReturn("192.168.1.1");
         when(rateLimitService.isAllowed("192.168.1.1", "/api/culturas")).thenReturn(false);
-        when(rateLimitService.getRetryAfterSeconds("192.168.1.1", "/api/culturas")).thenReturn(45L);
+        when(rateLimitService.getRetryAfterSeconds("192.168.1.1", "/api/culturas"))
+                .thenReturn(45L);
         StringWriter sw = new StringWriter();
         when(response.getWriter()).thenReturn(new PrintWriter(sw));
 

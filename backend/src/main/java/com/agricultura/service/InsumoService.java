@@ -161,7 +161,9 @@ public class InsumoService {
     }
 
     public Page<MovimentoEstoqueResponse> findMovimentosByInsumo(Long insumoId, Long userId, Pageable pageable) {
-        return movimentoEstoqueRepository.findByInsumoIdAndUserId(insumoId, userId, pageable).map(this::toResponse);
+        return movimentoEstoqueRepository
+                .findByInsumoIdAndUserId(insumoId, userId, pageable)
+                .map(this::toResponse);
     }
 
     public Page<MovimentoEstoqueResponse> findMovimentosByUser(Long userId, Pageable pageable) {

@@ -61,7 +61,8 @@ public class RateLimitFilter extends OncePerRequestFilter {
 
             Map<String, Object> errorResponse = new HashMap<>();
             errorResponse.put("error", "Taxa de requisições excedida");
-            errorResponse.put("message", "Você fez muitas requisições. Tente novamente em " + retryAfter + " segundos.");
+            errorResponse.put(
+                    "message", "Você fez muitas requisições. Tente novamente em " + retryAfter + " segundos.");
             errorResponse.put("status", 429);
 
             objectMapper.writeValue(response.getWriter(), errorResponse);

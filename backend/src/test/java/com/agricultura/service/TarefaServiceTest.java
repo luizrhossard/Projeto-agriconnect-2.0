@@ -159,7 +159,11 @@ class TarefaServiceTest {
         request.setDataVencimento(LocalDate.now().plusDays(5));
         request.setCulturaId(1L);
 
-        Usuario outroUsuario = Usuario.builder().id(2L).name("Outro").email("outro@example.com").build();
+        Usuario outroUsuario = Usuario.builder()
+                .id(2L)
+                .name("Outro")
+                .email("outro@example.com")
+                .build();
         Cultura culturaDeOutroUsuario = Cultura.builder()
                 .id(1L)
                 .nome("Cultura de Outro Usuario")
@@ -170,7 +174,8 @@ class TarefaServiceTest {
         when(culturaRepository.findById(1L)).thenReturn(Optional.of(culturaDeOutroUsuario));
 
         assertThrows(
-                org.springframework.security.access.AccessDeniedException.class, () -> tarefaService.create(request, 1L));
+                org.springframework.security.access.AccessDeniedException.class,
+                () -> tarefaService.create(request, 1L));
 
         verify(tarefaRepository, never()).save(any(Tarefa.class));
     }
@@ -185,7 +190,11 @@ class TarefaServiceTest {
         request.setDataVencimento(LocalDate.now().plusDays(3));
         request.setCulturaId(1L);
 
-        Usuario outroUsuario = Usuario.builder().id(2L).name("Outro").email("outro@example.com").build();
+        Usuario outroUsuario = Usuario.builder()
+                .id(2L)
+                .name("Outro")
+                .email("outro@example.com")
+                .build();
         Cultura culturaDeOutroUsuario = Cultura.builder()
                 .id(1L)
                 .nome("Cultura de Outro Usuario")
@@ -196,7 +205,8 @@ class TarefaServiceTest {
         when(culturaRepository.findById(1L)).thenReturn(Optional.of(culturaDeOutroUsuario));
 
         assertThrows(
-                org.springframework.security.access.AccessDeniedException.class, () -> tarefaService.update(1L, request, 1L));
+                org.springframework.security.access.AccessDeniedException.class,
+                () -> tarefaService.update(1L, request, 1L));
 
         verify(tarefaRepository, never()).save(any(Tarefa.class));
     }

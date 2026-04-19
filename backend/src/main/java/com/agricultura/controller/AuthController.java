@@ -34,7 +34,9 @@ public class AuthController {
     public ResponseEntity<AuthResponse> register(@Valid @RequestBody RegisterRequest request) {
         AuthResponse response = authService.register(request);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .header(HttpHeaders.SET_COOKIE, buildAuthCookie(response.getToken()).toString())
+                .header(
+                        HttpHeaders.SET_COOKIE,
+                        buildAuthCookie(response.getToken()).toString())
                 .body(response);
     }
 
@@ -42,7 +44,9 @@ public class AuthController {
     public ResponseEntity<AuthResponse> login(@Valid @RequestBody LoginRequest request) {
         AuthResponse response = authService.login(request);
         return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, buildAuthCookie(response.getToken()).toString())
+                .header(
+                        HttpHeaders.SET_COOKIE,
+                        buildAuthCookie(response.getToken()).toString())
                 .body(response);
     }
 

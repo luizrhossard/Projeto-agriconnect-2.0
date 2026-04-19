@@ -1,6 +1,5 @@
 package com.agricultura.service;
 
-import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

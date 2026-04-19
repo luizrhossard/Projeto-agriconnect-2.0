@@ -34,9 +34,8 @@ public class TarefaService {
 
     @Transactional(readOnly = true)
     public TarefaResponse findById(Long id, Long userId) {
-        Tarefa tarefa = tarefaRepository
-                .findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Tarefa nao encontrada"));
+        Tarefa tarefa =
+                tarefaRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Tarefa nao encontrada"));
 
         if (!tarefa.getUser().getId().equals(userId)) {
             throw new AccessDeniedException("Acesso negado a esta tarefa");
@@ -71,9 +70,8 @@ public class TarefaService {
 
     @Transactional
     public TarefaResponse update(Long id, TarefaRequest request, Long userId) {
-        Tarefa tarefa = tarefaRepository
-                .findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Tarefa nao encontrada"));
+        Tarefa tarefa =
+                tarefaRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Tarefa nao encontrada"));
 
         if (!tarefa.getUser().getId().equals(userId)) {
             throw new AccessDeniedException("Acesso negado a esta tarefa");
@@ -114,9 +112,8 @@ public class TarefaService {
 
     @Transactional
     public void delete(Long id, Long userId) {
-        Tarefa tarefa = tarefaRepository
-                .findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Tarefa nao encontrada"));
+        Tarefa tarefa =
+                tarefaRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Tarefa nao encontrada"));
 
         if (!tarefa.getUser().getId().equals(userId)) {
             throw new AccessDeniedException("Acesso negado a esta tarefa");
