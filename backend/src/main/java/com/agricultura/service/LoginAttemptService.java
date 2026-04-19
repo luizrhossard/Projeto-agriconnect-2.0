@@ -29,7 +29,7 @@ public class LoginAttemptService {
         String attemptsKey = ATTEMPTS_KEY_PREFIX + email;
         String lockKey = LOCK_KEY_PREFIX + email;
 
-        Long attempts = redisTemplate.opsForValue().increment(attemptsKey);
+        Long attempts = redisTemplate.opsForValue().increment(attemptsKey, 1L);
         redisTemplate.expire(attemptsKey, LOCK_TIME_MINUTES, TimeUnit.MINUTES);
 
         if (attempts != null && attempts >= MAX_ATTEMPTS) {
