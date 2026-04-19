@@ -39,7 +39,8 @@ class RateLimitServiceTest {
 
     @Test
     void isAllowed_FirstRequest_ReturnsTrue() {
-        when(valueOperations.increment("ratelimit:/api/culturas:192.168.1.1", 1L)).thenReturn(1L);
+        when(valueOperations.increment("ratelimit:/api/culturas:192.168.1.1", 1L))
+                .thenReturn(1L);
 
         assertTrue(rateLimitService.isAllowed(CLIENT_ID, ENDPOINT));
         verify(redisTemplate).expire("ratelimit:/api/culturas:192.168.1.1", 1, TimeUnit.MINUTES);
@@ -47,21 +48,24 @@ class RateLimitServiceTest {
 
     @Test
     void isAllowed_UnderLimit_ReturnsTrue() {
-        when(valueOperations.increment("ratelimit:/api/culturas:192.168.1.1", 1L)).thenReturn(30L);
+        when(valueOperations.increment("ratelimit:/api/culturas:192.168.1.1", 1L))
+                .thenReturn(30L);
 
         assertTrue(rateLimitService.isAllowed(CLIENT_ID, ENDPOINT));
     }
 
     @Test
     void isAllowed_AtLimit_ReturnsTrue() {
-        when(valueOperations.increment("ratelimit:/api/culturas:192.168.1.1", 1L)).thenReturn(60L);
+        when(valueOperations.increment("ratelimit:/api/culturas:192.168.1.1", 1L))
+                .thenReturn(60L);
 
         assertTrue(rateLimitService.isAllowed(CLIENT_ID, ENDPOINT));
     }
 
     @Test
     void isAllowed_OverLimit_ReturnsFalse() {
-        when(valueOperations.increment("ratelimit:/api/culturas:192.168.1.1", 1L)).thenReturn(61L);
+        when(valueOperations.increment("ratelimit:/api/culturas:192.168.1.1", 1L))
+                .thenReturn(61L);
 
         assertFalse(rateLimitService.isAllowed(CLIENT_ID, ENDPOINT));
     }
