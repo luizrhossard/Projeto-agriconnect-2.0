@@ -157,7 +157,7 @@ export function TasksPanel({ compact = false, tarefas, onTarefaCreated }: TasksP
   const [novaTarefa, setNovaTarefa] = useState<TarefaRequest>({
     titulo: '',
     descricao: '',
-    prioridade: 'MEDIUM',
+prioridade: 'MEDIA',
     dataVencimento: new Date().toISOString().split('T')[0]
   })
 
@@ -172,13 +172,18 @@ export function TasksPanel({ compact = false, tarefas, onTarefaCreated }: TasksP
     const task = tasksList.find(t => t.id === taskId)
     if (!task) return
     
+const priorityMap: Record<string, string> = {
+      'high': 'ALTA',
+      'medium': 'MEDIA',
+      'low': 'BAIXA'
+    }
     const novoStatus = task.status === 'completed' ? 'PENDING' : 'COMPLETED'
     
     try {
       await api.tarefas.update(taskId, { 
         titulo: task.title, 
         descricao: task.description,
-        prioridade: task.priority.toUpperCase(),
+        prioridade: priorityMap[task.priority] || 'MEDIA',
         status: novoStatus,
         dataVencimento: task.dueDate 
       })
@@ -198,14 +203,26 @@ export function TasksPanel({ compact = false, tarefas, onTarefaCreated }: TasksP
     }
   }
 
-  const handleCriarTarefa = async () => {
+const handleCriarTarefa = async () => {
     if (!novaTarefa.titulo) return
+    
+    const priorityMap: Record<string, string> = {
+      'high': 'ALTA',
+      'medium': 'MEDIA',
+      'low': 'BAIXA',
+      'ALTA': 'ALTA',
+      'MEDIA': 'MEDIA',
+      'BAIXA': 'BAIXA'
+    }
     
     try {
       setIsLoading(true)
-      await api.tarefas.create(novaTarefa)
+      await api.tarefas.create({
+        ...novaTarefa,
+        prioridade: priorityMap[novaTarefa.prioridade] || 'MEDIA'
+      })
       setIsDialogOpen(false)
-      setNovaTarefa({ titulo: '', descricao: '', prioridade: 'MEDIUM', dataVencimento: new Date().toISOString().split('T')[0] })
+      setNovaTarefa({ titulo: '', descricao: '', prioridade: 'MEDIA', dataVencimento: new Date().toISOString().split('T')[0] })
       onTarefaCreated?.()
     } catch (error) {
       console.error('Erro ao criar tarefa:', error)

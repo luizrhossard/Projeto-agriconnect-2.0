@@ -210,7 +210,7 @@ export function CropManagement({ compact = false, culturas, onCulturaCreated }: 
     nome: '',
     area: 0,
     dataPlantio: new Date().toISOString().split('T')[0],
-    previsaoColheita: '',
+    previsaoColheita: undefined,
     icone: 'soja',
     progress: 0
   })
@@ -263,9 +263,15 @@ export function CropManagement({ compact = false, culturas, onCulturaCreated }: 
     try {
       setIsLoading(true)
       setErrorMessage(null)
-      await api.culturas.create(novaCultura)
+      
+      const payload = { ...novaCultura }
+      if (!payload.previsaoColheita) {
+        delete payload.previsaoColheita
+      }
+
+      await api.culturas.create(payload)
       setIsDialogOpen(false)
-      setNovaCultura({ nome: '', area: 0, dataPlantio: new Date().toISOString().split('T')[0], previsaoColheita: '', icone: 'soja', progress: 0 })
+      setNovaCultura({ nome: '', area: 0, dataPlantio: new Date().toISOString().split('T')[0], previsaoColheita: undefined, icone: 'soja', progress: 0 })
       onCulturaCreated?.()
     } catch (error: any) {
       console.error('Erro ao criar cultura:', error)

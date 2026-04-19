@@ -90,7 +90,11 @@ const mapTarefaToTarefaData = (tarefa: TarefaResponse): TarefaData => {
   const priorityMap: Record<string, 'high' | 'medium' | 'low'> = {
     'HIGH': 'high',
     'MEDIUM': 'medium',
-    'LOW': 'low'
+    'LOW': 'low',
+    'ALTA': 'high',
+    'MEDIA': 'medium',
+    'BAIXA': 'low',
+    'URGENTE': 'high'
   }
   const statusMap: Record<string, 'pending' | 'in_progress' | 'completed'> = {
     'PENDING': 'pending',

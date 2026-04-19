@@ -46,6 +46,7 @@ services:
       APP_JWT_EXPIRATION: 86400000
       APP_RATE_LIMIT_ENABLED: true
       APP_RATE_LIMIT_REQUESTS_PER_MINUTE: 60
+      APP_SEEDER_ENABLED: "true"
     ports:
       - "8080:8080"
     depends_on:
